@@ -1,0 +1,22 @@
+<h2>JSON-Z</h2>
+
+<h3>JavaScript or JSON input:</h3>
+<textarea pInputTextarea
+  [(ngModel)]="source"
+  autocapitalize="off"
+  autocorrect="off"
+  class="code"
+  cols="60"
+  rows="20"
+  spellcheck="false"
+  (input)="onChange()"></textarea>
+
+<br><br>
+
+<h3>JSON-Z output:</h3>
+<textarea pInputTextarea
+  [ngModel]="output"
+  class="code"
+  cols="60"
+  rows="20"
+  readonly></textarea>
