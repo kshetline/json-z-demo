@@ -16,8 +16,8 @@ export function saferEval(expression: string): any {
   if (!/.*\breturn\b[^'"`]+$/.test(expression))
     expression = `return (${expression})`;
 
-  return new Function('window', 'document', 'globalThis', 'eval', 'console',
+  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console',
     'BigInt', 'BigDecimal',
-    expression)(null, null, null, null, null,
+    expression)(null, null, null, null, null, null,
       bigIntImpl, BigDecimal);
 }

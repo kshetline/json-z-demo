@@ -1,5 +1,29 @@
+h1 {
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+.option-sets {
+  margin-bottom: 1em;
+
+  p-button {
+    margin: 0 1em 1em 0;
+  }
+}
+
 .code {
   display: inline-block;
-  font: 14px "Lucida Console", "Courier New", monospace;
+  font: 14px "Roboto Mono", "Courier New", monospace;
+  margin-bottom: 2em;
+  min-width: 280px;
   resize: none;
+  width: calc(100% - 1em);
+}
+
+.experimental ::ng-deep label {
+  font-style: italic;
 }

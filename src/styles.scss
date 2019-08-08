@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+@import '~bootstrap/scss/bootstrap-reboot';
+@import '~bootstrap/scss/bootstrap-grid';
+
+@font-face {
+  font-family: OpenSans2;
+  src: url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+}
+
+body {
+  color: #333c40;
+  font-family: "Open Sans", OpenSans2, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  margin: 1em 0 1em 1em;
+}

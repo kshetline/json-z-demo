@@ -32,7 +32,7 @@
       "timeEnd"
     ],
     "no-empty": false,
-    "no-trailing-whitespace": true,
+    "no-trailing-whitespace": [true, "ignore-blank-lines"],
     "object-literal-shorthand": false,
     "object-literal-sort-keys": false,
     "one-line": [

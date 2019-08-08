@@ -1,22 +1,59 @@
-<h2>JSON-Z</h2>
+<h1>JSON-Z</h1>
+<h2>Interactive Demo</h2>
 
-<h3>JavaScript or JSON input:</h3>
-<textarea pInputTextarea
-  [(ngModel)]="source"
-  autocapitalize="off"
-  autocorrect="off"
-  class="code"
-  cols="60"
-  rows="20"
-  spellcheck="false"
-  (input)="onChange()"></textarea>
+<div class="option-sets">
+  <p-button label="Most Compatible" [disabled]="isCompatible()" (onClick)="setCompatible()"></p-button>
+  <p-button label="Relaxed" [disabled]="isRelaxed()" (onClick)="setRelaxed()"></p-button>
+  <p-button label="The Works" [disabled]="isTheWorks()" (onClick)="setTheWorks()"></p-button><br><br>
 
-<br><br>
+  <p-checkbox binary="true" label="extendedPrimitives"
+    [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox><br>
+  <p-dropdown [options]="extendedTypesOptions" placeholder="extendedTypes"
+    [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown><br>
+  <p-checkbox binary="true" label="primitiveBigDecimal"
+    [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox><br>
+  <p-checkbox binary="true" label="primitiveBigInt"
+    [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox><br>
+  <p-dropdown [options]="quoteOptions" placeholder="quote"
+    [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown><br>
+  <p-checkbox binary="true" label="quoteAllKeys"
+    [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox><br>
+  <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
+    [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox><br>
+  <p-checkbox binary="true" label="sparseArrays"
+    [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox><br>
+  <p-checkbox binary="true" label="trailingComma"
+    [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox><br>
+</div>
 
-<h3>JSON-Z output:</h3>
-<textarea pInputTextarea
-  [ngModel]="output"
-  class="code"
-  cols="60"
-  rows="20"
-  readonly></textarea>
+<div class="row">
+  <div class="col-sm">
+    <h3>JavaScript or JSON input:</h3>
+    <textarea pInputTextarea
+      [(ngModel)]="source"
+      autocapitalize="off"
+      autocorrect="off"
+      class="code"
+      rows="20"
+      spellcheck="false"
+      (input)="onChange(true)"></textarea>
+  </div>
+
+  <div class="col-sm">
+    <h3>JSON-Z output:</h3>
+    <textarea pInputTextarea
+      [ngModel]="output"
+      class="code"
+      rows="20"
+      readonly></textarea>
+  </div>
+
+  <div class="col-sm">
+    <h3>Reparsed</h3>
+    <textarea pInputTextarea
+      [ngModel]="reparsed"
+      class="code"
+      rows="20"
+      readonly></textarea>
+  </div>
+</div>
