@@ -36,7 +36,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/json-z-demo",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -44,6 +44,7 @@
             "aot": false,
             "assets": [
               "src/favicon.ico",
+              "src/nggyu.svg",
               "src/assets"
             ],
             "styles": [

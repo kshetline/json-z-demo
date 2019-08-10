@@ -1,6 +1,13 @@
 <div class="header">
   <h1>JSON-Z</h1>
-  <h2>Interactive Demo</h2>
+  <div class="badges">
+    <img src="https://img.shields.io/npm/v/json-z.svg" alt="npm">
+    <img src="https://travis-ci.com/kshetline/json-z.svg?branch=master" alt="build status">
+    <img src="https://coveralls.io/repos/github/kshetline/json-z/badge.svg?branch=master" alt="coverage status">
+    <img src="https://img.shields.io/npm/dm/json-z.svg" alt="downloads">
+    <img src="https://img.shields.io/bundlephobia/min/json-z.svg" alt="minified size">
+  </div>
+  <h2>Interactive Demo <span style="color: #E00;">(alpha version)</span></h2>
 </div>
 
 <div class="option-sets">
@@ -9,31 +16,54 @@
   <p-button label="The Works" [disabled]="isTheWorks()" (onClick)="setTheWorks()"></p-button>
 </div>
 
-<div class="boolean-options">
-  <p-checkbox binary="true" label="extendedPrimitives"
-    [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="primitiveBigDecimal"
-    [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="primitiveBigInt"
-    [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="quoteAllKeys"
-    [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
-    [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="sparseArrays"
-    [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox><br>
-  <p-checkbox binary="true" label="trailingComma"
-    [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox><br>
-</div>
+<div class="details-wrapper"><div class="details">
+  <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
+    <div class="boolean-options">
+      <p-checkbox binary="true" label="extendedPrimitives"
+        [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="primitiveBigDecimal"
+        [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="primitiveBigInt"
+        [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="quoteAllKeys"
+        [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
+        [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="sparseArrays"
+        [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
+      <p-checkbox binary="true" label="trailingComma"
+        [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox>
+    </div>
 
-  <p-dropdown [options]="extendedTypesOptions" placeholder="extendedTypes"
-    [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown><br>
-  <p-dropdown [options]="quoteOptions" placeholder="quote"
-    [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown><br>
+    <div class="other-options">
+      <span class="labeled-dropdown">
+        <label>extendedTypes:</label>
+        <p-dropdown [options]="extendedTypesOptions" placeholder="extendedTypes"
+          [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown>
+      </span>
+      <span class="labeled-dropdown">
+        <label>quote:</label>
+        <p-dropdown [options]="quoteOptions" placeholder="quote"
+          [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown>
+      </span>
+      <span class="labeled-input">
+        <label for="typePrefix">typePrefix:</label>
+        <input id="typePrefix" pInputText
+          [(ngModel)]="currentOptions.typePrefix" (input)="onChange()">
+      </span>
+      <span class="labeled-input">
+        <label for="space">space:</label>
+        <input id="space" pInputText
+          [(ngModel)]="space" (input)="onChange()">
+      </span>
+    </div>
+  </p-fieldset>
+</div></div>
 
 <div class="row">
   <div class="col">
-    <h3>JavaScript or JSON input:</h3>
+    <h3>JavaScript or JSON input<span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
+    </h3>
     <textarea pInputTextarea
       [(ngModel)]="source"
       autocapitalize="off"
@@ -41,7 +71,8 @@
       class="code"
       rows="20"
       spellcheck="false"
-      (input)="onChange(true)"></textarea>
+      (input)="onChange(true)"></textarea><br>
+    <span *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</span>
   </div>
 
   <div class="col">

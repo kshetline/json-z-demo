@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
+import { FieldsetModule } from 'primeng/fieldset';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule} from 'primeng/inputtextarea';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -23,6 +24,7 @@ import { AppComponent } from './app.component';
     ButtonModule,
     CheckboxModule,
     DropdownModule,
+    FieldsetModule,
     FormsModule,
     InputTextareaModule,
     InputTextModule,

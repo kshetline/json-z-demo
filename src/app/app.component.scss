@@ -7,6 +7,17 @@ h1 {
   text-align: center;
 }
 
+.badges {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  width: calc(100% - 1em);
+
+  img {
+    margin: 0.5em;
+  }
+}
+
 h2 {
   margin: 0 0 1em 0;
   text-align: center;
@@ -25,17 +36,70 @@ h2 {
   }
 }
 
+.details-wrapper {
+  width: calc(100vw - 2em);
+}
+
 .boolean-options {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
-  width: calc(100% - 1em);
+  margin-top: 1em;
 
   p-checkbox {
     flex: 0 1 0;
     margin: 0 0.5em 1em 0.5em;
     min-width: 225px;
   }
+}
+
+.labeled-dropdown {
+  position: relative;
+  white-space: nowrap;
+
+  label {
+    display: inline-block;
+    min-width: 125px;
+    padding-right: 0.5em;
+    position: relative;
+    text-align: right;
+    top: 2px;
+  }
+}
+
+.labeled-input {
+  position: relative;
+  white-space: nowrap;
+
+  label {
+    display: inline-block;
+    min-width: 125px;
+    padding-right: 0.5em;
+    position: relative;
+    text-align: right;
+    top: 2px;
+  }
+}
+
+.other-options {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+
+  span {
+    flex: 0 1 0;
+    margin: 0 0.5em 1em 0.5em;
+  }
+}
+
+.native-big-int-star {
+  color: #0A0;
+}
+
+.native-big-int-footnote {
+  color: #0A0;
+  position: relative;
+  top: -1.5em;
 }
 
 .code {
@@ -46,6 +110,10 @@ h2 {
   min-width: calc(100vw - 3em);
   resize: none;
   width: calc(100% - 1em);
+
+  &:read-only {
+    background-color: #F8F8F8;
+  }
 }
 
 @media screen and (min-width: calc(280px - 2em)) {
@@ -55,8 +123,18 @@ h2 {
 }
 
 @media screen and (max-width: 767px) {
-  .code {
+  .code, input {
     font-size: 16px; // Prevent zoom on input focus
+  }
+}
+
+@media screen and (max-width: 349px) {
+  .details-wrapper {
+    margin: -10% -15% -15% -10%;
+  }
+
+  .details {
+    transform: scale(0.80);
   }
 }
 

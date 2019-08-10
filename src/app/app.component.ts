@@ -85,9 +85,14 @@ export class AppComponent {
   ];
 
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
-  source = '';
+  detailsCollapsed = false;
   output = '';
   reparsed = '';
+  source = '';
+  space = '2';
+
+  // noinspection JSMethodCanBeStatic
+  get hasNativeBigInt(): boolean { return JSONZ.hasNativeBigInt(); }
 
   constructor() { }
 
@@ -102,7 +107,7 @@ export class AppComponent {
 
     try {
       this.sourceValue = saferEval(this.source);
-      this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, 2);
+      this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.getSpace());
       this.newErrorTime = 0;
       this.reparse(delayError);
     }
@@ -135,7 +140,7 @@ export class AppComponent {
 
     try {
       this.reparsedValue = JSON.parse(this.output);
-      this.reparsed = JSON.stringify(this.reparsedValue);
+      this.reparsed = JSON.stringify(this.reparsedValue, null, this.getSpace());
     }
     catch (err) {
       if (!this.newReparseErrorTime)
@@ -177,5 +182,11 @@ export class AppComponent {
     this.currentOptions = {};
     Object.assign(this.currentOptions, theWorks);
     this.onChange();
+  }
+
+  private getSpace(): string | number {
+    const spaces = Math.round(parseFloat(this.space));
+
+    return isNaN(spaces) ? this.space : spaces;
   }
 }
