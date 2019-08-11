@@ -13,6 +13,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { SharedModule } from 'primeng/shared';
 
 import { AppComponent } from './app.component';
+import { PreferencesService } from './preferences.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { AppComponent } from './app.component';
     RadioButtonModule,
     SharedModule,
   ],
-  providers: [],
+  providers: [PreferencesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

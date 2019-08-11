@@ -8,14 +8,21 @@ h1 {
 }
 
 .badges {
+  align-items: center;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   width: calc(100% - 1em);
 
-  img {
+  a {
     margin: 0.5em;
   }
+}
+
+.github {
+  padding-left: 0.33em;
+  position: relative;
+  top: -5px;
 }
 
 h2 {
@@ -99,7 +106,7 @@ h2 {
 .native-big-int-footnote {
   color: #0A0;
   position: relative;
-  top: -1.5em;
+  top: -2em;
 }
 
 .code {
