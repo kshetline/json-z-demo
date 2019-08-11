@@ -30,6 +30,16 @@ h2 {
   text-align: center;
 }
 
+h3 {
+  position: relative;
+  height: 1.4em;
+
+  p-dropdown {
+    position: relative;
+    top: -1px;
+  }
+}
+
 .option-sets {
   display: flex;
   flex-flow: row wrap;
@@ -120,6 +130,10 @@ h2 {
 
   &:read-only {
     background-color: #F8F8F8;
+  }
+
+  &.error {
+    background-color: #FFDDDD;
   }
 }
 

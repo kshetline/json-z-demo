@@ -62,7 +62,7 @@
       <span class="labeled-input">
         <label for="typePrefix">typePrefix:</label>
         <input id="typePrefix" pInputText
-          [(ngModel)]="currentOptions.typePrefix" (input)="onChange()">
+          [(ngModel)]="currentOptions.typePrefix" (input)="onParsingChange()">
       </span>
       <span class="labeled-input">
         <label for="space">space:</label>
@@ -75,7 +75,10 @@
 
 <div class="row">
   <div class="col">
-    <h3>JavaScript or JSON input<span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
+    <h3>
+      <p-dropdown [options]="inputOptions" placeholder="input options"
+        [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
+      as input<span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
     </h3>
     <textarea pInputTextarea
       [(ngModel)]="source"
@@ -88,20 +91,25 @@
     <span *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</span>
   </div>
 
-  <div class="col">
+  <div *ngIf="showJsonZOutput" class="col">
     <h3>JSON-Z output:</h3>
     <textarea pInputTextarea
       [ngModel]="output"
       class="code"
+      [class.error]="outputError"
       rows="20"
       readonly></textarea>
   </div>
 
   <div class="col">
-    <h3>Reparsed</h3>
+    <h3>Reparsed
+      <p-dropdown [options]="reparseOptions" placeholder="reparse options"
+        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown> :
+    </h3>
     <textarea pInputTextarea
       [ngModel]="reparsed"
       class="code"
+      [class.error]="reparsedError"
       rows="20"
       readonly></textarea>
   </div>

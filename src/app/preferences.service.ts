@@ -3,9 +3,22 @@ import * as JSONZ from 'json-z';
 import { JsonZOptions } from 'json-z';
 import { cloneDeep, debounce } from 'lodash';
 
+export enum InputOptions {
+  AS_JAVASCRIPT,
+  AS_JSONZ
+}
+
+export enum ReparseOptions {
+  AS_JSON,
+  AS_JSONP,
+  AS_JSONP_ASSISTED
+}
+
 export interface Preferences {
   detailsCollapsed?: boolean;
+  inputOption?: InputOptions;
   options?: JsonZOptions;
+  reparseOption?: ReparseOptions;
   source?: string;
   space?: string | number;
 }
