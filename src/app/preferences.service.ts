@@ -11,7 +11,8 @@ export enum InputOptions {
 export enum ReparseOptions {
   AS_JSON,
   AS_JSONP,
-  AS_JSONP_ASSISTED
+  AS_JSONP_ASSISTED,
+  AS_JSONZ
 }
 
 export interface Preferences {
@@ -27,10 +28,10 @@ export interface Preferences {
 export class PreferencesService {
   private prefs: Preferences;
   private debouncedSaveSettings = debounce(() =>
-      localStorage.setItem('prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS)), 2000);
+      localStorage.setItem('jsonz-prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS)), 2000);
 
   constructor() {
-    const prefsStr = localStorage.getItem('prefs');
+    const prefsStr = localStorage.getItem('jsonz-prefs');
 
     if (prefsStr) {
       try {

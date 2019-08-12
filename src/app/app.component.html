@@ -20,7 +20,7 @@
       <img src="https://img.shields.io/bundlephobia/min/json-z.svg" alt="minified size">
     </a>
   </div>
-  <h2>Interactive Demo <span style="color: #E00;">(alpha version)</span></h2>
+  <h2>Interactive Demo <span style="color: #A0A;">(beta version)</span></h2>
 </div>
 
 <div class="option-sets">
@@ -61,12 +61,12 @@
       </span>
       <span class="labeled-input">
         <label for="typePrefix">typePrefix:</label>
-        <input id="typePrefix" pInputText
-          [(ngModel)]="currentOptions.typePrefix" (input)="onParsingChange()">
+        <input id="typePrefix" pInputText [class.error]="typePrefixError"
+          [(ngModel)]="typePrefix" (input)="onParsingChange()">
       </span>
       <span class="labeled-input">
         <label for="space">space:</label>
-        <input id="space" pInputText
+        <input id="space" pInputText [class.error]="spaceError"
           [(ngModel)]="space" (input)="onChange()">
       </span>
     </div>
@@ -88,7 +88,7 @@
       rows="20"
       spellcheck="false"
       (input)="onChange(true)"></textarea><br>
-    <span *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</span>
+    <div *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</div>
   </div>
 
   <div *ngIf="showJsonZOutput" class="col">
@@ -104,7 +104,7 @@
   <div class="col">
     <h3>Reparsed
       <p-dropdown [options]="reparseOptions" placeholder="reparse options"
-        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown> :
+        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown> *:
     </h3>
     <textarea pInputTextarea
       [ngModel]="reparsed"
@@ -112,5 +112,6 @@
       [class.error]="reparsedError"
       rows="20"
       readonly></textarea>
+    <div class="footnote">*After being reparsed, displayed as JSON-Z</div>
   </div>
 </div>

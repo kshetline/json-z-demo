@@ -3,7 +3,7 @@ import * as BigIntAlt from 'big-integer';
 import * as BigDecimal from 'decimal.js';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
-import { clone, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
 import { NOTHIN_NADA_ZIP, saferEval } from './safer-eval';
@@ -59,7 +59,31 @@ const theWorks: JsonZOptions = {
   typePrefix: '_',
 };
 
-const theWorksPlus = Object.assign(clone(theWorks), { revealHiddenArrayProperties: true});
+let prefixRegex = /^(_|(_[_$a-z0-9]*_))$/i;
+
+try {
+  // Use smarter recognition of identifier characters, if available.
+  const regex = new RegExp('^(_|(_[_$\\p{L}\\p{Nd}\\p{Mn}\\p{Mc}\\p{Pc}]*_))$', 'iu');
+
+  if (regex.test('_å_'))
+    prefixRegex = regex;
+}
+catch (err) {}
+
+let spaceRegex = /^[\t\n\v\f\r \xA0\u2028\u2029\uFEFF]{0,10}$/;
+
+try {
+  // Use smarter recognition of identifier characters, if available.
+  const regex = new RegExp('^[\\t\\n\\v\\f\\r \\xA0\\u2028\\u2029\\uFEFF\\p{Zs}]{0,10}$', 'u');
+
+  if (regex.test('\u2029'))
+    spaceRegex = regex;
+}
+catch (err) {}
+
+function isValidTypePrefix(prefix: string): boolean {
+  return prefixRegex.test(prefix);
+}
 
 @Component({
   selector: 'jz-root',
@@ -67,13 +91,15 @@ const theWorksPlus = Object.assign(clone(theWorks), { revealHiddenArrayPropertie
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  private lastErrorTimer: any;
-  private newErrorTime = 0;
-  private lastReparseErrorTimer: any;
-  private newReparseErrorTime = 0;
-  private sourceValue: any;
-  private reparsedValue: any;
   private _detailsCollapsed = false;
+  private lastErrorTimer: any;
+  private lastReparseErrorTimer: any;
+  private newErrorTime = 0;
+  private newReparseErrorTime = 0;
+  private reparsedValue: any;
+  private sourceValue: any;
+  private _space: string | number = 2;
+  private _typePrefix = '_';
 
   extendedTypesOptions = [
     { label: 'OFF', value: ExtendedTypeMode.OFF },
@@ -96,7 +122,8 @@ export class AppComponent implements OnInit {
   reparseOptions = [
     { label: 'using JSON', value: ReparseOptions.AS_JSON },
     { label: 'using JSONP', value: ReparseOptions.AS_JSONP },
-    { label: 'using assisted JSONP', value: ReparseOptions.AS_JSONP_ASSISTED }
+    { label: 'using assisted JSONP', value: ReparseOptions.AS_JSONP_ASSISTED },
+    { label: 'using JSON-Z', value: ReparseOptions.AS_JSONZ }
   ];
 
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
@@ -108,7 +135,8 @@ export class AppComponent implements OnInit {
   reparseOption = ReparseOptions.AS_JSON;
   showJsonZOutput = true;
   source = '';
-  space = '2';
+  spaceError = false;
+  typePrefixError = false;
 
   get detailsCollapsed(): boolean { return this._detailsCollapsed; }
   set detailsCollapsed(newValue: boolean) {
@@ -116,6 +144,49 @@ export class AppComponent implements OnInit {
       this._detailsCollapsed = newValue;
       this.updatePrefs();
     }
+  }
+
+  get space(): string | number { return this._space; }
+  set space(newValue: string | number) {
+    newValue = String(newValue);
+
+    if (this._space !== newValue) {
+      if (/^\s*\d\d?\s*/.test(newValue)) {
+        const space = parseInt(newValue, 10);
+
+        if (space > 10)
+          this.spaceError = true;
+        else {
+          this._space = space;
+          this.spaceError = false;
+        }
+      }
+      else if (spaceRegex.test(newValue)) {
+        this._space = newValue;
+        this.spaceError = false;
+      }
+      else {
+        this.spaceError = true;
+      }
+    }
+    else if (this._space === newValue)
+      this.spaceError = false;
+  }
+
+  get typePrefix(): string { return this._typePrefix; }
+  set typePrefix(newValue: string) {
+    if (this._typePrefix !== newValue) {
+      if (isValidTypePrefix(newValue)) {
+        this._typePrefix = newValue;
+        this.typePrefixError = false;
+        this.currentOptions.typePrefix = newValue;
+      }
+      else {
+        this.typePrefixError = true;
+      }
+    }
+    else if (this._typePrefix === newValue)
+      this.typePrefixError = false;
   }
 
   // noinspection JSMethodCanBeStatic
@@ -130,11 +201,14 @@ export class AppComponent implements OnInit {
       this.currentOptions = prefs.options || this.currentOptions;
       this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON,
       this.source = prefs.source || '';
-      this.space = String(prefs.space || 0);
+      this.space = prefs.space || 0;
+      this.typePrefix = this.currentOptions.typePrefix;
+      // Get back the default if the prefs value turned out to be invalid
+      this.currentOptions.typePrefix = this.typePrefix;
 
       this.showJsonZOutput = this.inputOption === InputOptions.AS_JAVASCRIPT;
 
-      if (this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED)
+      if (this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED || this.reparseOption === ReparseOptions.AS_JSONZ)
         JSONZ.globalizeTypeHandlers(this.currentOptions.typePrefix);
     }
   }
@@ -150,7 +224,7 @@ export class AppComponent implements OnInit {
       this.showJsonZOutput = showJsonZ;
 
       if (showJsonZ) {
-        this.source = this.output = this.reparsed = '';
+        this.source = this.sourceValue = this.output = this.reparsed = '';
         this.outputError = this.reparsedError = false;
       }
       else
@@ -161,7 +235,7 @@ export class AppComponent implements OnInit {
   }
 
   onParsingChange(updateThePrefs = true): void {
-    if (this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED)
+    if (this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED || this.reparseOption === ReparseOptions.AS_JSONZ)
       JSONZ.globalizeTypeHandlers(this.currentOptions.typePrefix);
     else
       JSONZ.removeGlobalizedTypeHandlers();
@@ -186,7 +260,7 @@ export class AppComponent implements OnInit {
     if (this.showJsonZOutput) {
       try {
         this.sourceValue = saferEval(this.source);
-        this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.getSpace());
+        this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
         this.outputError = false;
         this.newErrorTime = 0;
         this.reparse(delayError);
@@ -205,6 +279,7 @@ export class AppComponent implements OnInit {
       }
     }
     else {
+      this.sourceValue = (!this.source || this.source.trim() === '' ? NOTHIN_NADA_ZIP : this.source);
       this.output = this.source;
       this.outputError = false;
       this.newErrorTime = 0;
@@ -213,8 +288,6 @@ export class AppComponent implements OnInit {
   }
 
   private reparse(delayError = false): void {
-    const asJSON = this.reparseOption === ReparseOptions.AS_JSON;
-
     if (this.lastReparseErrorTimer) {
       clearTimeout(this.lastReparseErrorTimer);
       this.lastReparseErrorTimer = undefined;
@@ -232,13 +305,23 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    try {
-      if (asJSON)
-        this.reparsedValue = JSON.parse(this.output);
-      else
-        this.reparsedValue = saferEval(this.output);
+    let reparsedAs: string;
 
-      this.reparsed = JSONZ.stringify(this.reparsedValue, theWorksPlus, this.getSpace());
+    try {
+      if (this.reparseOption === ReparseOptions.AS_JSON) {
+        reparsedAs = 'as standard JSON';
+        this.reparsedValue = JSON.parse(this.output);
+      }
+      else if (this.reparseOption === ReparseOptions.AS_JSONZ) {
+        reparsedAs = 'using JSONZ';
+        this.reparsedValue = JSONZ.parse(this.output);
+      }
+      else {
+        reparsedAs = 'using JSONP';
+        this.reparsedValue = saferEval(this.output);
+      }
+
+      this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
       this.reparsedError = false;
     }
     catch (err) {
@@ -248,7 +331,7 @@ export class AppComponent implements OnInit {
       this.lastReparseErrorTimer = setTimeout(() => {
         this.lastReparseErrorTimer = undefined;
         this.newReparseErrorTime = 0;
-        this.reparsed = `Cannot be reparsed ${asJSON ? 'as standard JSON' : 'using JSONP'}:\n\n` + err.toLocaleString();
+        this.reparsed = `Cannot be reparsed ${reparsedAs}:\n\n` + err.toLocaleString();
         this.reparsedError = true;
       }, delayError ? ERROR_DELAY : 0);
     }
@@ -269,36 +352,32 @@ export class AppComponent implements OnInit {
   setCompatible(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, compatibleOptions);
+    this.typePrefix = '_';
     this.onChange();
   }
 
   setRelaxed(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, relaxedOptions);
+    this.typePrefix = '_';
     this.onChange();
   }
 
   setTheWorks(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, theWorks);
+    this.typePrefix = '_';
     this.onChange();
   }
 
-  private getSpace(): string | number {
-    const spaces = Math.round(parseFloat(this.space));
-
-    return isNaN(spaces) ? this.space : spaces;
-  }
-
   private updatePrefs(): void {
-    const space = parseFloat(this.space);
     const prefs = {
       detailsCollapsed: this.detailsCollapsed,
       inputOption: this.inputOption,
       options: this.currentOptions,
       reparseOption: this.reparseOption,
       source: this.source,
-      space: isNaN(space) ? this.space : space
+      space: this.space
     };
 
     this.prefsService.set(prefs);

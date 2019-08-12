@@ -113,10 +113,14 @@ h3 {
   color: #0A0;
 }
 
-.native-big-int-footnote {
-  color: #0A0;
+.footnote {
   position: relative;
   top: -2em;
+}
+
+.native-big-int-footnote {
+  @extend .footnote;
+  color: #0A0;
 }
 
 .code {
@@ -131,10 +135,10 @@ h3 {
   &:read-only {
     background-color: #F8F8F8;
   }
+}
 
-  &.error {
-    background-color: #FFDDDD;
-  }
+.error {
+  background-color: #FDD !important;
 }
 
 @media screen and (min-width: calc(280px - 2em)) {
