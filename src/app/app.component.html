@@ -57,6 +57,7 @@
       <span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
     </h3>
     <div class="icons">
+      <!--suppress AngularUndefinedBinding -->
       <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
         [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
         (touchstart)="touchToHover($event)"></i>
@@ -65,6 +66,7 @@
       <i class="fas fa-trash" [class.faded]="!source" (click)="clearSource()"></i>
     </div>
     <textarea pInputTextarea
+      title="Source"
       [(ngModel)]="source"
       autocapitalize="off"
       autocorrect="off"
@@ -78,6 +80,7 @@
   <div *ngIf="showJsonZOutput" class="col panel">
     <h3 class="json-z-output">JSON-Z output:</h3>
     <textarea pInputTextarea
+      title = "Output"
       [ngModel]="output"
       class="code"
       [class.error]="outputError"
@@ -91,6 +94,7 @@
         [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown>*:
     </h3>
     <textarea pInputTextarea
+      title="Reparsed"
       [ngModel]="reparsed"
       class="code"
       [class.error]="reparsedError"
