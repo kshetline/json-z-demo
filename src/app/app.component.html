@@ -1,28 +1,4 @@
-<div class="header">
-  <h1>JSON-Z</h1>
-  <div class="badges">
-    <a href="https://github.com/kshetline/json-z/" target="_blank">
-      <div><img src="./assets/github.svg" width="20" height="20" alt="github"><span class="github">github</span></div>
-    </a>
-    <a href="https://npmjs.org/package/json-z/" target="_blank">
-      <img src="https://img.shields.io/npm/v/json-z.svg" alt="npm">
-    </a>
-    <a href="https://travis-ci.com/kshetline/json-z" target="_blank">
-      <img src="https://travis-ci.com/kshetline/json-z.svg?branch=master" alt="build status">
-    </a>
-    <a href="https://coveralls.io/github/kshetline/json-z" target="_blank">
-      <img src="https://coveralls.io/repos/github/kshetline/json-z/badge.svg?branch=master" alt="coverage status">
-    </a>
-    <a href="https://npmjs.org/package/json-z/" target="_blank">
-      <img src="https://img.shields.io/npm/dm/json-z.svg" alt="downloads">
-    </a>
-    <a href="https://npmjs.org/package/json-z/" target="_blank">
-      <img src="https://img.shields.io/bundlephobia/min/json-z.svg" alt="minified size">
-    </a>
-  </div>
-  <h2>Interactive Demo <span style="color: #A0A;">(beta version)</span></h2>
-</div>
-
+<div [innerHTML]="banner | keepHtml"></div>
 <div class="option-sets">
   <p-button label="Most Compatible" [disabled]="isCompatible()" (onClick)="setCompatible()"></p-button>
   <p-button label="Relaxed" [disabled]="isRelaxed()" (onClick)="setRelaxed()"></p-button>
@@ -74,12 +50,20 @@
 </div></div>
 
 <div class="row">
-  <div class="col">
+  <div class="col panel">
     <h3>
       <p-dropdown [options]="inputOptions" placeholder="input options"
         [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
-      as input<span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
+      <span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
     </h3>
+    <div class="icons">
+      <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
+        [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
+        (touchstart)="touchToHover($event)"></i>
+      <p-menu #samples [popup]="true" [model]="sampleOptions" appendTo="body" (onHide)="sampleSelected($event)"></p-menu>
+      <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
+      <i class="fas fa-trash" [class.faded]="!source" (click)="clearSource()"></i>
+    </div>
     <textarea pInputTextarea
       [(ngModel)]="source"
       autocapitalize="off"
@@ -91,8 +75,8 @@
     <div *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</div>
   </div>
 
-  <div *ngIf="showJsonZOutput" class="col">
-    <h3>JSON-Z output:</h3>
+  <div *ngIf="showJsonZOutput" class="col panel">
+    <h3 class="json-z-output">JSON-Z output:</h3>
     <textarea pInputTextarea
       [ngModel]="output"
       class="code"
@@ -101,10 +85,10 @@
       readonly></textarea>
   </div>
 
-  <div class="col">
+  <div class="col panel">
     <h3>Reparsed
       <p-dropdown [options]="reparseOptions" placeholder="reparse options"
-        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown> *:
+        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown>*:
     </h3>
     <textarea pInputTextarea
       [ngModel]="reparsed"

@@ -13,7 +13,7 @@ export function saferEval(expression: string): any {
   if (!expression || expression.trim() === '')
     return NOTHIN_NADA_ZIP;
 
-  if (!/.*\breturn\b[^'"`]+$/.test(expression))
+  if (!/.*\breturn\b[^'"`\}]+$/.test(expression))
     expression = `return (${expression})`;
 
   return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console',

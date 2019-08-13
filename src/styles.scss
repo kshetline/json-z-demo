@@ -11,6 +11,38 @@ body {
   margin: 1em 0 1em 1em;
 }
 
+.header {
+  width: calc(100% - 1em);
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+}
+
+.badges {
+  align-items: center;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  width: calc(100% - 1em);
+
+  a > img {
+    margin: 0.5em;
+  }
+}
+
+.github {
+  padding-left: 0.33em;
+  position: relative;
+  top: -5px;
+}
+
+h2 {
+  margin: 0 0 1em 0;
+  text-align: center;
+}
+
 @media screen and (max-width: 767px) {
   select, input, textarea {
     font-size: 16px; // Prevent zoom on input focus
@@ -31,4 +63,15 @@ body {
 
 p-button button {
   width: 100%;
+}
+
+.tooltip.ui-tooltip {
+  .ui-tooltip-arrow {
+    border-bottom-color: #7AF !important;
+  }
+
+  .ui-tooltip-text {
+    background-color: #7AF;
+    color: black;
+  }
 }

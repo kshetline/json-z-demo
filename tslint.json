@@ -45,6 +45,7 @@
       true,
       "single"
     ],
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
     "trailing-comma": false,
     "typedef": [
       true,

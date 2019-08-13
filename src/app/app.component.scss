@@ -1,35 +1,3 @@
-.header {
-  width: calc(100% - 1em);
-}
-
-h1 {
-  margin: 0;
-  text-align: center;
-}
-
-.badges {
-  align-items: center;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  width: calc(100% - 1em);
-
-  a {
-    margin: 0.5em;
-  }
-}
-
-.github {
-  padding-left: 0.33em;
-  position: relative;
-  top: -5px;
-}
-
-h2 {
-  margin: 0 0 1em 0;
-  text-align: center;
-}
-
 h3 {
   position: relative;
   height: 1.4em;
@@ -54,7 +22,7 @@ h3 {
 }
 
 .details-wrapper {
-  width: calc(100vw - 2em);
+  width: calc(100% - 1em);
 }
 
 .boolean-options {
@@ -84,17 +52,53 @@ h3 {
   }
 }
 
-.labeled-input {
+.panel {
   position: relative;
+
+  p-dropdown {
+    margin-right: 0.25em;
+  }
+}
+
+.icons {
+  color: #666;
+  position: absolute;
+  right: 1.5em;
+  top: 2.1em;
+
+  i {
+    cursor: pointer;
+    margin-left: 0.5em;
+  }
+}
+
+.sample-menu {
+  font-size: 1.5em;
+  left: -2px;
+  position: relative;
+  top: 3px;
+}
+
+.info {
+  color: #29F;
+}
+
+.faded {
+  opacity: 0.33;
+}
+
+.labeled-input {
   white-space: nowrap;
 
   label {
     display: inline-block;
     min-width: 125px;
     padding-right: 0.5em;
-    position: relative;
     text-align: right;
-    top: 2px;
+  }
+
+  input {
+    width: 175px;
   }
 }
 
@@ -137,11 +141,17 @@ h3 {
   }
 }
 
+.json-z-output {
+  position: relative;
+  top: 4px;
+}
+
 .error {
   background-color: #FDD !important;
 }
 
-@media screen and (min-width: calc(280px - 2em)) {
+// Used to be `min-width: calc(280px - 2em)`, but it seems that Edge can't handle `calc` in this context.
+@media screen and (min-width: 252px) {
   .code {
     min-width: 280px;
   }
@@ -153,7 +163,7 @@ h3 {
   }
 }
 
-@media screen and (max-width: 349px) {
+@media screen and (max-width: 374px) {
   .details-wrapper {
     margin: -10% -15% -15% -10%;
   }

@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as BigIntAlt from 'big-integer';
 import * as BigDecimal from 'decimal.js';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
 import { isEqual } from 'lodash';
+import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
 import { NOTHIN_NADA_ZIP, saferEval } from './safer-eval';
+import { sample1, sample2 } from './samples';
 
 JSONZ.setBigDecimal(BigDecimal);
 
@@ -85,12 +88,17 @@ function isValidTypePrefix(prefix: string): boolean {
   return prefixRegex.test(prefix);
 }
 
+enum SampleOptions {
+  JAVASCRIPT,
+  JSONZ
+}
+
 @Component({
   selector: 'jz-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
   private lastErrorTimer: any;
   private lastReparseErrorTimer: any;
@@ -100,6 +108,14 @@ export class AppComponent implements OnInit {
   private sourceValue: any;
   private _space: string | number = 2;
   private _typePrefix = '_';
+  private needsMouseLeave: HTMLElement;
+
+  private clickListener = () => {
+    if (this.needsMouseLeave) {
+      this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
+      this.needsMouseLeave = undefined;
+    }
+  };
 
   extendedTypesOptions = [
     { label: 'OFF', value: ExtendedTypeMode.OFF },
@@ -126,11 +142,19 @@ export class AppComponent implements OnInit {
     { label: 'using JSON-Z', value: ReparseOptions.AS_JSONZ }
   ];
 
+  sampleOptions: MenuItem[] = [
+    { label: 'JavaScript sample', command: () => this.sampleSelected(SampleOptions.JAVASCRIPT) },
+    { label: 'JSON-Z sample', command: () => this.sampleSelected(SampleOptions.JSONZ) }
+  ];
+
+  banner = '';
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
+  inputInfo = 'Sample<br><i>text</i>';
   inputOption = InputOptions.AS_JAVASCRIPT;
   output = '';
   outputError = false;
   reparsed = '';
+  reparsedAsJSON = '';
   reparsedError = false;
   reparseOption = ReparseOptions.AS_JSON;
   showJsonZOutput = true;
@@ -192,14 +216,20 @@ export class AppComponent implements OnInit {
   // noinspection JSMethodCanBeStatic
   get hasNativeBigInt(): boolean { return JSONZ.hasNativeBigInt(); }
 
-  constructor(private prefsService: PreferencesService) {
+  constructor(
+    private http: HttpClient,
+    private prefsService: PreferencesService
+  ) {
+    http.get('assets/banner.html', { responseType: 'text' })
+      .subscribe(content => this.banner = content.toString());
+
     const prefs = prefsService.get();
 
     if (prefs) {
       this._detailsCollapsed = !!prefs.detailsCollapsed;
       this.inputOption = prefs.inputOption || InputOptions.AS_JAVASCRIPT;
       this.currentOptions = prefs.options || this.currentOptions;
-      this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON,
+      this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON;
       this.source = prefs.source || '';
       this.space = prefs.space || 0;
       this.typePrefix = this.currentOptions.typePrefix;
@@ -215,20 +245,54 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.onParsingChange(false);
+    document.addEventListener('click', this.clickListener);
   }
 
-  onInputOptionChange(): void {
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.clickListener);
+  }
+
+  sampleSelected(sampleOption: SampleOptions): void {
+    switch (sampleOption) {
+      case SampleOptions.JAVASCRIPT:
+        this.inputOption = InputOptions.AS_JAVASCRIPT;
+        this.onInputOptionChange(sample1);
+        break;
+
+      case SampleOptions.JSONZ:
+        this.inputOption = InputOptions.AS_JSONZ;
+        this.onInputOptionChange(sample2);
+        break;
+    }
+  }
+
+  touchToHover(event: TouchEvent): void {
+    event.preventDefault();
+
+    if (this.needsMouseLeave) {
+      this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
+      this.needsMouseLeave = undefined;
+    }
+    else {
+      this.needsMouseLeave = event.target as HTMLElement;
+      this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseenter'));
+    }
+  }
+
+  onInputOptionChange(newSource?: string): void {
     const showJsonZ = this.inputOption === InputOptions.AS_JAVASCRIPT;
 
-    if (this.showJsonZOutput !== showJsonZ) {
+    if (this.showJsonZOutput !== showJsonZ || newSource) {
       this.showJsonZOutput = showJsonZ;
 
       if (showJsonZ) {
-        this.source = this.sourceValue = this.output = this.reparsed = '';
+        this.sourceValue = this.output = this.reparsed = '';
+        this.source = newSource || this.reparsedAsJSON;
+        this.reparsedAsJSON = '';
         this.outputError = this.reparsedError = false;
       }
       else
-        this.source = this.output;
+        this.source = newSource || (this.outputError ? '' : this.output);
     }
 
     this.onChange(false, true);
@@ -241,6 +305,11 @@ export class AppComponent implements OnInit {
       JSONZ.removeGlobalizedTypeHandlers();
 
     this.onChange(false, updateThePrefs);
+  }
+
+  clearSource(): void {
+    this.source = '';
+    this.onChange();
   }
 
   onChange(delayError = false, updateThePrefs = true): void {
@@ -323,8 +392,11 @@ export class AppComponent implements OnInit {
 
       this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
       this.reparsedError = false;
+      this.reparsedAsJSON = ''; // JSON.stringify(this.reparsedValue, null, this.space);
     }
     catch (err) {
+      this.reparsedAsJSON = '';
+
       if (!this.newReparseErrorTime)
         this.newReparseErrorTime = performance.now();
 
