@@ -27,7 +27,9 @@ export const sample2 =
   backtickQuotes: \`I can use "double quotes"  and 'single quotes' here\`,
   lineBreaks: "Look, Mom! \\
 No \\\\n's!",
-  million: 1_000_000, // Underscore separators in numbers allowed
+  // Underscore separators in numbers allowed
+  // (Safari currently doesn't like these underscores for JSONP.)
+  million: 1_000_000,
   hexadecimal: 0xdecaf,
   // Leading 0 indicates octal if no non-octal digits (8, 9) follow
   octal: [0o7, 074],
@@ -36,8 +38,12 @@ No \\\\n's!",
   negativeZero: -0,
   positiveSign: +1,
   notDefined: undefined,
-  bigInt: -9223372036854775808n,
-  bigDecimal: 3.141592653589793238462643383279m,
+  // Line below commented out to allow assisted JSON-P parsing
+  // bigInt: -9223372036854775808n,
+  bigInt: _BigInt("-9223372036854775808"),
+  // Line below commented out to allow assisted JSON-P parsing
+  // bigDecimal: 3.141592653589793238462643383279m,
+  bigDecimal: _BigDecimal('3.141592653589793238462643383279'),
   trailingComma: 'in objects', andIn: ['arrays',],
   sparseArray: [1, 2, , , 5],
   // Function-like extended types. This is revived as a JavaScript \`Date\` object

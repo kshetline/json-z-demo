@@ -16,13 +16,11 @@ import { SharedModule } from 'primeng/shared';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AppComponent } from './app.component';
-import { EscapeHtmlPipe } from './keep-html.pipe';
 import { PreferencesService } from './preferences.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EscapeHtmlPipe,
   ],
   imports: [
     BrowserAnimationsModule,

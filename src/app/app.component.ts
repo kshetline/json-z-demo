@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import * as BigIntAlt from 'big-integer';
 import * as BigDecimal from 'decimal.js';
 import * as JSONZ from 'json-z';
@@ -93,6 +94,23 @@ enum SampleOptions {
   JSONZ
 }
 
+const inputInfoJavaScript =
+`You can enter JSON below, or JavaScript code in one of the following forms:\
+<ul>
+  <li>A JavaScript value as a primitive, object, or array.</li>
+  <li>JavaScript code ending with <code>return <i>variableName</i></code></li>
+  <li>An IIFE returning the desired value.</li>
+</ul>\
+The functions <code>BigInt(<i>string</i>)</code> and <code>BigDecimal(<i>string</i>)</code> \
+are available for making values compatible with assisted JSONP.`;
+
+const inputInfoJsonz =
+`You can enter JSON-Z below, taking full advantage of all JSON-Z features, \
+not just the features selected for stringification above.
+
+The functions <code>BigInt(<i>string</i>)</code> and <code>BigDecimal(<i>string</i>)</code> \
+are available for making values compatible with assisted JSONP.`;
+
 @Component({
   selector: 'jz-root',
   templateUrl: './app.component.html',
@@ -147,9 +165,9 @@ export class AppComponent implements OnDestroy, OnInit {
     { label: 'JSON-Z sample', command: () => this.sampleSelected(SampleOptions.JSONZ) }
   ];
 
-  banner = '';
+  banner: SafeHtml;
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
-  inputInfo = 'Sample<br><i>text</i>';
+  inputInfo = inputInfoJavaScript;
   inputOption = InputOptions.AS_JAVASCRIPT;
   output = '';
   outputError = false;
@@ -218,16 +236,19 @@ export class AppComponent implements OnDestroy, OnInit {
 
   constructor(
     private http: HttpClient,
-    private prefsService: PreferencesService
+    private prefsService: PreferencesService,
+    private sanitizer: DomSanitizer,
   ) {
     http.get('assets/banner.html', { responseType: 'text' })
-      .subscribe(content => this.banner = content.toString());
+      .subscribe(content => this.banner = sanitizer.bypassSecurityTrustHtml(content.toString()));
 
     const prefs = prefsService.get();
+    const startWithSample = !prefs || !prefs.source;
 
     if (prefs) {
       this._detailsCollapsed = !!prefs.detailsCollapsed;
       this.inputOption = prefs.inputOption || InputOptions.AS_JAVASCRIPT;
+      this.inputInfo = (this.inputOption === InputOptions.AS_JAVASCRIPT ? inputInfoJavaScript : inputInfoJsonz);
       this.currentOptions = prefs.options || this.currentOptions;
       this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON;
       this.source = prefs.source || '';
@@ -241,6 +262,9 @@ export class AppComponent implements OnDestroy, OnInit {
       if (this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED || this.reparseOption === ReparseOptions.AS_JSONZ)
         JSONZ.globalizeTypeHandlers(this.currentOptions.typePrefix);
     }
+
+    if (startWithSample)
+      this.sampleSelected(SampleOptions.JAVASCRIPT);
   }
 
   ngOnInit(): void {
@@ -256,12 +280,18 @@ export class AppComponent implements OnDestroy, OnInit {
     switch (sampleOption) {
       case SampleOptions.JAVASCRIPT:
         this.inputOption = InputOptions.AS_JAVASCRIPT;
+        this.reparseOption = ReparseOptions.AS_JSON;
         this.onInputOptionChange(sample1);
+        this.onParsingChange(false);
+        this.setCompatible();
         break;
 
       case SampleOptions.JSONZ:
         this.inputOption = InputOptions.AS_JSONZ;
+        this.reparseOption = ReparseOptions.AS_JSONP_ASSISTED;
         this.onInputOptionChange(sample2);
+        this.onParsingChange(false);
+        this.setTheWorks();
         break;
     }
   }
@@ -286,16 +316,20 @@ export class AppComponent implements OnDestroy, OnInit {
       this.showJsonZOutput = showJsonZ;
 
       if (showJsonZ) {
+        this.inputInfo = inputInfoJavaScript;
         this.sourceValue = this.output = this.reparsed = '';
         this.source = newSource || this.reparsedAsJSON;
         this.reparsedAsJSON = '';
         this.outputError = this.reparsedError = false;
       }
-      else
+      else {
+        this.inputInfo = inputInfoJsonz;
         this.source = newSource || (this.outputError ? '' : this.output);
+      }
     }
 
-    this.onChange(false, true);
+    if (!newSource)
+      this.onChange(false, true);
   }
 
   onParsingChange(updateThePrefs = true): void {
@@ -392,7 +426,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
       this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
       this.reparsedError = false;
-      this.reparsedAsJSON = ''; // JSON.stringify(this.reparsedValue, null, this.space);
+
+      try {
+        this.reparsedAsJSON = JSON.stringify(this.reparsedValue, null, this.space);
+      }
+      catch (err) {
+        this.reparsedAsJSON = '';
+      }
     }
     catch (err) {
       this.reparsedAsJSON = '';

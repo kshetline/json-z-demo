@@ -1,4 +1,5 @@
-<div [innerHTML]="banner | keepHtml"></div>
+<div [innerHTML]="banner"></div>
+
 <div class="option-sets">
   <p-button label="Most Compatible" [disabled]="isCompatible()" (onClick)="setCompatible()"></p-button>
   <p-button label="Relaxed" [disabled]="isRelaxed()" (onClick)="setRelaxed()"></p-button>
