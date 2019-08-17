@@ -17,10 +17,12 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { AppComponent } from './app.component';
 import { PreferencesService } from './preferences.service';
+import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    ShrinkWrapComponent,
   ],
   imports: [
     BrowserAnimationsModule,

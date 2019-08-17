@@ -108,7 +108,7 @@ const inputInfoJsonz =
 `You can enter JSON-Z below, taking full advantage of all JSON-Z features, \
 not just the features selected for stringification above.
 
-The functions <code>BigInt(<i>string</i>)</code> and <code>BigDecimal(<i>string</i>)</code> \
+The functions <code>_BigInt(<i>string</i>)</code> and <code>_BigDecimal(<i>string</i>)</code> \
 are available for making values compatible with assisted JSONP.`;
 
 @Component({

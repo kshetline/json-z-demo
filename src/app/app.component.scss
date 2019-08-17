@@ -12,6 +12,7 @@ h3 {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+  margin-bottom: -5px;
   width: calc(100% - 1em);
 
   p-button {
@@ -21,7 +22,9 @@ h3 {
   }
 }
 
-.details-wrapper {
+.details {
+  margin-right: 1em;
+  padding-top: 5px;
   width: calc(100% - 1em);
 }
 
@@ -160,16 +163,6 @@ h3 {
 @media screen and (max-width: 767px) {
   .code, input {
     font-size: 16px; // Prevent zoom on input focus
-  }
-}
-
-@media screen and (max-width: 374px) {
-  .details-wrapper {
-    margin: -10% -15% -15% -10%;
-  }
-
-  .details {
-    transform: scale(0.80);
   }
 }
 
