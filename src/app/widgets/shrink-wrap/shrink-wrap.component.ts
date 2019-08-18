@@ -8,7 +8,7 @@ import { debounce } from 'lodash';
   styleUrls: ['./shrink-wrap.component.scss']
 })
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
-  private outer: HTMLDivElement;
+  private inner: HTMLDivElement;
   private sizer: HTMLDivElement;
   private lastWidth = 0;
   private lastHeight = 0;
@@ -20,7 +20,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   marginY = 0;
   scale = 1;
 
-  @ViewChild('outer', { static: true }) outerRef: ElementRef;
+  @ViewChild('inner', { static: true }) innerRef: ElementRef;
   @ViewChild('sizer', { static: true }) sizerRef: ElementRef;
 
   @Input() boundingElement: string | HTMLElement = document.documentElement;
@@ -29,10 +29,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.outer = this.outerRef.nativeElement;
+    this.inner = this.innerRef.nativeElement;
     this.sizer = this.sizerRef.nativeElement;
 
-    addResizeListener(this.outer, this.onResize);
+    addResizeListener(this.inner, this.onResize);
     addResizeListener(this.sizer, this.onResize);
 
     this.onResize();
@@ -44,39 +44,43 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   ngOnDestroy(): void {
     removeResizeListener(this.sizer, this.onResize);
-    removeResizeListener(this.outer, this.onResize);
+    removeResizeListener(this.inner, this.onResize);
   }
 
   onResize = debounce((): void => {
-    const outerWidth = this.outer.getBoundingClientRect().width;
-    const outerHeight = this.outer.getBoundingClientRect().height;
+    const innerWidth = this.inner.getBoundingClientRect().width;
+    const innerHeight = this.inner.getBoundingClientRect().height;
     const sizerWidth = Math.min(this.sizer.getBoundingClientRect().width, this.getBoundingWidth());
-    const sizerHeight = sizerWidth * outerHeight / outerWidth;
+    const sizerHeight = sizerWidth * innerHeight / innerWidth;
 
     if (Math.abs(sizerWidth - this.lastSizerWidth) <= 1 &&
-        Math.abs(outerWidth - this.lastWidth) <= 2 &&
-        Math.abs(outerHeight - this.lastHeight) <= 2) {
+        Math.abs(innerWidth - this.lastWidth) <= 2 &&
+        Math.abs(innerHeight - this.lastHeight) <= 2) {
       return;
     }
 
     const oldScale = this.scale;
-    let scalingWidth = outerWidth;
+    const oldMx = this.marginX;
+    const oldMy = this.marginX;
+    let scalingWidth = innerWidth;
 
     if (!this.thresholdWidth && scalingWidth > sizerWidth)
       this.thresholdWidth = scalingWidth;
-    else if (this.thresholdWidth)
+    else if (this.thresholdWidth) {
       scalingWidth = this.thresholdWidth;
+    }
 
     this.scale = Math.min(Math.max(sizerWidth / scalingWidth, this.minScale), 1);
+    this.marginX = this.scale === 1 ? 0 : Math.ceil((sizerWidth - innerWidth / this.scale) / 2);
+    this.marginY = this.scale === 1 ? 0 : Math.ceil((sizerHeight - innerHeight / this.scale) / 2);
 
-    if (this.scale === this.minScale && oldScale === this.minScale)
-      return;
+    if (this.scale === this.minScale && oldScale === this.minScale) {
+      this.marginX = Math.max(this.marginX, oldMx);
+      this.marginY = Math.max(this.marginY, oldMy);
+    }
 
-    this.marginX = this.scale === 1 ? 0 : Math.ceil((sizerWidth - outerWidth / this.scale) / 2);
-    this.marginY = this.scale === 1 ? 0 : Math.ceil((sizerHeight - outerHeight / this.scale) / 2);
-
-    this.lastWidth = outerWidth;
-    this.lastHeight = outerHeight;
+    this.lastWidth = innerWidth;
+    this.lastHeight = innerHeight;
     this.lastSizerWidth = sizerWidth;
 
     if (this.scale === 1)
@@ -98,7 +102,6 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
                    parseFloat(style.getPropertyValue('border-left-width') || '0') +
                    parseFloat(style.getPropertyValue('border-right-width') || '0');
 
-    console.log('width:', width - margin);
     return width - margin;
   }
 }

@@ -1,5 +1,4 @@
-:host {
-  display: block;
+.outer-wrapper {
   position: relative;
 }
 
@@ -11,7 +10,7 @@
   z-index: -1000;
 }
 
-.outer-wrapper {
+.inner-wrapper {
   overflow: hidden;
   position: relative;
   width: fit-content;

@@ -1,6 +1,8 @@
-<div #sizer class="sizer">&nbsp;</div>
-<div #outer class="outer-wrapper">
-  <div [ngStyle]="innerStyle">
-    <ng-content></ng-content>
+<div class="outer-wrapper">
+  <div #sizer class="sizer">&nbsp;</div>
+  <div #inner class="inner-wrapper">
+    <div [ngStyle]="innerStyle">
+      <ng-content></ng-content>
+    </div>
   </div>
 </div>
