@@ -13,5 +13,6 @@
 .inner-wrapper {
   overflow: hidden;
   position: relative;
+  width: -moz-fit-content;
   width: fit-content;
 }
