@@ -10,41 +10,73 @@ import { debounce } from 'lodash';
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private inner: HTMLDivElement;
   private sizer: HTMLDivElement;
+  private thresholdSizer: HTMLDivElement;
   private lastWidth = 0;
   private lastHeight = 0;
   private lastSizerWidth = 0;
   private thresholdWidth: number;
+  private afterInit = false;
 
   innerStyle = {};
   marginX = 0;
   marginY = 0;
   scale = 1;
+  thresholdStyle: any = {};
 
   @ViewChild('inner', { static: true }) innerRef: ElementRef;
   @ViewChild('sizer', { static: true }) sizerRef: ElementRef;
+  @ViewChild('thresholdSizer', { static: true }) thresholdSizerRef: ElementRef;
 
   @Input() boundingElement: string | HTMLElement = document.documentElement;
   @Input() minScale = 0.75;
+
+  @Input() set threshold(newValue: number | string) {
+    let changed = false;
+
+    if (typeof newValue === 'number' || !isNaN(Number(newValue))) {
+      newValue = Number(newValue);
+
+      if (this.thresholdWidth !== newValue) {
+        this.thresholdWidth = newValue;
+        this.thresholdStyle = {};
+        changed = true;
+      }
+    }
+    else if (this.thresholdStyle.width !== newValue) {
+      this.thresholdStyle = { width: newValue };
+      this.thresholdWidth = undefined;
+      changed = true;
+    }
+
+    if (changed) {
+      this.lastSizerWidth = 0;
+
+      if (this.afterInit)
+        setTimeout(() => this.onResize());
+    }
+  }
 
   constructor() { }
 
   ngOnInit(): void {
     this.inner = this.innerRef.nativeElement;
     this.sizer = this.sizerRef.nativeElement;
+    this.thresholdSizer = this.thresholdSizerRef.nativeElement;
 
     addResizeListener(this.inner, this.onResize);
     addResizeListener(this.sizer, this.onResize);
-
-    this.onResize();
+    addResizeListener(this.thresholdSizer, this.onResize);
   }
 
   ngAfterViewInit(): void {
+    this.afterInit = true;
     setTimeout(() => this.onResize());
   }
 
   ngOnDestroy(): void {
-    removeResizeListener(this.sizer, this.onResize);
     removeResizeListener(this.inner, this.onResize);
+    removeResizeListener(this.sizer, this.onResize);
+    removeResizeListener(this.thresholdSizer, this.onResize);
   }
 
   onResize = debounce((): void => {
@@ -64,7 +96,9 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     const oldMy = this.marginX;
     let scalingWidth = innerWidth;
 
-    if (!this.thresholdWidth && scalingWidth > sizerWidth)
+    if (this.thresholdStyle.width)
+      scalingWidth = this.thresholdSizer.getBoundingClientRect().width;
+    else if (!this.thresholdWidth && scalingWidth > sizerWidth)
       this.thresholdWidth = scalingWidth;
     else if (this.thresholdWidth) {
       scalingWidth = this.thresholdWidth;
@@ -95,13 +129,23 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     if (!elem)
       elem = document.documentElement;
 
-    const width = elem.clientWidth;
-    const style = window.getComputedStyle(elem === document.documentElement ? document.body : elem, null);
-    const margin = parseFloat(style.getPropertyValue('margin-left') || '0') +
-                   parseFloat(style.getPropertyValue('margin-right') || '0') +
-                   parseFloat(style.getPropertyValue('border-left-width') || '0') +
-                   parseFloat(style.getPropertyValue('border-right-width') || '0');
+    let width = elem.clientWidth;
+    const isDocElem = (elem === document.documentElement);
 
-    return width - margin;
+    if (isDocElem)
+      elem = document.body;
+
+    const style = window.getComputedStyle(elem, null);
+    const contentBox = style.getPropertyValue('box-sizing') === 'content-box';
+
+    if (isDocElem)
+      width -= parseFloat(style.getPropertyValue('margin-left') || '0') +
+               parseFloat(style.getPropertyValue('margin-right') || '0');
+
+    if (contentBox)
+      width -= parseFloat(style.getPropertyValue('border-left-width') || '0') +
+               parseFloat(style.getPropertyValue('border-right-width') || '0');
+
+    return width;
   }
 }

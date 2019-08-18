@@ -1,5 +1,7 @@
 <div class="outer-wrapper">
   <div #sizer class="sizer">&nbsp;</div>
+  <div #thresholdSizer class="threshold-sizer"
+    [ngStyle]="thresholdStyle">&nbsp;</div>
   <div #inner class="inner-wrapper">
     <div [ngStyle]="innerStyle">
       <ng-content></ng-content>

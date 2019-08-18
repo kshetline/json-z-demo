@@ -2,12 +2,16 @@
   position: relative;
 }
 
-.sizer {
+.sizer, .threshold-sizer {
   height: 1px;
   opacity: 0;
   position: absolute;
   width: 100%;
   z-index: -1000;
+}
+
+.sizer {
+  width: 100%;
 }
 
 .inner-wrapper {
