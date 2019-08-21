@@ -95,11 +95,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   @Output() scaleChange = new EventEmitter<number>();
 
-  onResize = debounce((): void => {
-    const innerWidth = this.inner.getBoundingClientRect().width;
-    const innerHeight = this.inner.getBoundingClientRect().height;
+  onResize = debounce(() => {
+    const innerWidth = this.inner.clientWidth;
+    const innerHeight = this.inner.clientHeight;
     const sizerWidth = Math.min(this.sizer.getBoundingClientRect().width, this.getBoundingWidth());
-    const sizerHeight = sizerWidth * innerHeight / innerWidth;
 
     if (Math.abs(sizerWidth - this.lastSizerWidth) <= 1 &&
         Math.abs(innerWidth - this.lastWidth) <= 1 &&
@@ -107,9 +106,6 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       return;
     }
 
-    const oldScale = this.scale;
-    const oldMx = this.marginX;
-    const oldMy = this.marginX;
     let scalingWidth = innerWidth;
 
     if (this.thresholdStyle.width)
@@ -120,13 +116,12 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       scalingWidth = this.thresholdWidth;
 
     this.scale = Math.min(Math.max(sizerWidth / scalingWidth, this.minScale), 1);
-    this.marginX = this.scale === 1 ? 0 : Math.ceil((sizerWidth - innerWidth / this.scale) / 2);
-    this.marginY = this.scale === 1 ? 0 : Math.ceil((sizerHeight - innerHeight / this.scale) / 2);
 
-    if (this.scale === this.minScale && oldScale === this.minScale) {
-      this.marginX = Math.max(this.marginX, oldMx);
-      this.marginY = Math.max(this.marginY, oldMy);
-    }
+    const scaledWidth = scalingWidth * this.scale;
+    const scaledHeight = scaledWidth * innerHeight / innerWidth;
+
+    this.marginX = this.scale === 1 ? 0 : Math.ceil((scaledWidth - innerWidth) / 2);
+    this.marginY = this.scale === 1 ? 0 : Math.ceil((scaledHeight - innerHeight) / 2);
 
     this.lastWidth = innerWidth;
     this.lastHeight = innerHeight;
@@ -135,7 +130,11 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     if (this.scale === 1)
       this.innerStyle = {};
     else
-      this.innerStyle = { transform: `scale(${this.scale})`, margin: `${this.marginY}px ${this.marginX}px` };
+      this.innerStyle = {
+        transform: `scale(${this.scale})`,
+        margin: `${this.marginY}px ${this.marginX}px`,
+        'max-width': `${scalingWidth}px`
+      };
 
     this.scaleChange.emit(this.scale);
   }, 10);
