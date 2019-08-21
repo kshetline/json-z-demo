@@ -1,6 +1,9 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { addResizeListener, removeResizeListener } from 'detect-resize';
 import { debounce } from 'lodash';
+
+const docElem = document.documentElement;
+const DEFAULT_MIN = 0.75;
 
 @Component({
   selector: 'ks-shrink-wrap',
@@ -8,6 +11,9 @@ import { debounce } from 'lodash';
   styleUrls: ['./shrink-wrap.component.scss']
 })
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
+  private afterInit = false;
+  private _boundingElement: HTMLElement = docElem;
+  private _minScale = DEFAULT_MIN;
   private inner: HTMLDivElement;
   private sizer: HTMLDivElement;
   private thresholdSizer: HTMLDivElement;
@@ -15,7 +21,6 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private lastHeight = 0;
   private lastSizerWidth = 0;
   private thresholdWidth: number;
-  private afterInit = false;
 
   innerStyle = {};
   marginX = 0;
@@ -27,8 +32,40 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild('sizer', { static: true }) sizerRef: ElementRef;
   @ViewChild('thresholdSizer', { static: true }) thresholdSizerRef: ElementRef;
 
-  @Input() boundingElement: string | HTMLElement = document.documentElement;
-  @Input() minScale = 0.75;
+  @Input() get minScale(): number { return this._minScale; }
+  set minScale(newValue: number) {
+    if (typeof newValue as any === 'string') {
+      const $ = /([\d.]+)(%)?/.exec(newValue as any as string);
+
+      if ($) {
+        newValue = Number($[1]);
+
+        if ($[2])
+          newValue /= 100;
+      }
+    }
+
+    if (isNaN(newValue) || !newValue)
+      this._minScale = DEFAULT_MIN;
+    else
+      this._minScale = Math.min(Math.max(newValue, 0.01), 1);
+  }
+
+  @Input() set boundingElement(newValue: string | HTMLElement) {
+    if (!newValue)
+      newValue = docElem;
+    else if (typeof newValue === 'string')
+      newValue = document.getElementById(newValue);
+
+    if (this._boundingElement !== newValue) {
+      this.removeResizeListener(this._boundingElement);
+      this._boundingElement = newValue;
+      this.addResizeListener(this._boundingElement);
+
+      if (this.afterInit)
+        setTimeout(() => this.onResize());
+    }
+  }
 
   @Input() set threshold(newValue: number | string) {
     let changed = false;
@@ -56,28 +93,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     }
   }
 
-  constructor() { }
-
-  ngOnInit(): void {
-    this.inner = this.innerRef.nativeElement;
-    this.sizer = this.sizerRef.nativeElement;
-    this.thresholdSizer = this.thresholdSizerRef.nativeElement;
-
-    addResizeListener(this.inner, this.onResize);
-    addResizeListener(this.sizer, this.onResize);
-    addResizeListener(this.thresholdSizer, this.onResize);
-  }
-
-  ngAfterViewInit(): void {
-    this.afterInit = true;
-    setTimeout(() => this.onResize());
-  }
-
-  ngOnDestroy(): void {
-    removeResizeListener(this.inner, this.onResize);
-    removeResizeListener(this.sizer, this.onResize);
-    removeResizeListener(this.thresholdSizer, this.onResize);
-  }
+  @Output() scaleChange = new EventEmitter<number>();
 
   onResize = debounce((): void => {
     const innerWidth = this.inner.getBoundingClientRect().width;
@@ -86,8 +102,8 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     const sizerHeight = sizerWidth * innerHeight / innerWidth;
 
     if (Math.abs(sizerWidth - this.lastSizerWidth) <= 1 &&
-        Math.abs(innerWidth - this.lastWidth) <= 2 &&
-        Math.abs(innerHeight - this.lastHeight) <= 2) {
+        Math.abs(innerWidth - this.lastWidth) <= 1 &&
+        Math.abs(innerHeight - this.lastHeight) <= 1) {
       return;
     }
 
@@ -100,9 +116,8 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       scalingWidth = this.thresholdSizer.getBoundingClientRect().width;
     else if (!this.thresholdWidth && scalingWidth > sizerWidth)
       this.thresholdWidth = scalingWidth;
-    else if (this.thresholdWidth) {
+    else if (this.thresholdWidth)
       scalingWidth = this.thresholdWidth;
-    }
 
     this.scale = Math.min(Math.max(sizerWidth / scalingWidth, this.minScale), 1);
     this.marginX = this.scale === 1 ? 0 : Math.ceil((sizerWidth - innerWidth / this.scale) / 2);
@@ -121,16 +136,42 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       this.innerStyle = {};
     else
       this.innerStyle = { transform: `scale(${this.scale})`, margin: `${this.marginY}px ${this.marginX}px` };
-  }, 50);
+
+    this.scaleChange.emit(this.scale);
+  }, 10);
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.inner = this.innerRef.nativeElement;
+    this.sizer = this.sizerRef.nativeElement;
+    this.thresholdSizer = this.thresholdSizerRef.nativeElement;
+
+    this.addResizeListener(this.inner);
+    this.addResizeListener(this.sizer);
+    this.addResizeListener(this.thresholdSizer);
+    this.addResizeListener(this._boundingElement);
+    window.addEventListener('resize', this.onResize);
+  }
+
+  ngAfterViewInit(): void {
+    this.afterInit = true;
+    setTimeout(() => this.onResize());
+  }
+
+  ngOnDestroy(): void {
+    this.removeResizeListener(this.inner);
+    this.removeResizeListener(this.sizer);
+    this.removeResizeListener(this.thresholdSizer);
+    this.removeResizeListener(this._boundingElement);
+    window.removeEventListener('resize', this.onResize);
+  }
 
   getBoundingWidth(): number {
-    let elem = (typeof this.boundingElement === 'string' ? document.getElementById(this.boundingElement) : this.boundingElement);
-
-    if (!elem)
-      elem = document.documentElement;
+    let elem = this._boundingElement;
 
     let width = elem.clientWidth;
-    const isDocElem = (elem === document.documentElement);
+    const isDocElem = (elem === docElem);
 
     if (isDocElem)
       elem = document.body;
@@ -147,5 +188,15 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
                parseFloat(style.getPropertyValue('border-right-width') || '0');
 
     return width;
+  }
+
+  private addResizeListener(elem): void {
+    if (elem !== docElem)
+      addResizeListener(elem, this.onResize);
+  }
+
+  private removeResizeListener(elem): void {
+    if (elem !== docElem)
+      removeResizeListener(elem, this.onResize);
   }
 }
