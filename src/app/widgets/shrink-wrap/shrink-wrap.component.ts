@@ -5,6 +5,18 @@ import { debounce } from 'lodash';
 const docElem = document.documentElement;
 const DEFAULT_MIN = 0.75;
 
+// This component fails to work (sometimes in a very dramatic fashion, with the content it's
+// supposed to be showing doing a dramatic animated dive off the screen!) on the original
+// non-Chromium version of Microsoft Edge. Therefore we want to disable it for that browser.
+// At the time of this writing, the user agent string for the original Edge has the word
+// "Edge" fully spelled out, while the beta Chromium Edge simply has "Edg". If that changes
+// in the future, the test for Edge below will have to be updated.
+//
+// It also doesn't work on IE.
+
+const NOT_SUPPORTED = / Edge\//.test(navigator.userAgent) ||
+                      /(?:\b(MS)?IE\s+|\bTrident\/7\.0;.*\s+rv:)(\d+)/.test(navigator.userAgent);
+
 @Component({
   selector: 'ks-shrink-wrap',
   templateUrl: './shrink-wrap.component.html',
@@ -25,6 +37,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   innerStyle = {};
   marginX = 0;
   marginY = 0;
+  outerStyle = {};
   scale = 1;
   thresholdStyle: any = {};
 
@@ -62,7 +75,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       this._boundingElement = newValue;
       this.addResizeListener(this._boundingElement);
 
-      if (this.afterInit)
+      if (this.afterInit && !NOT_SUPPORTED)
         setTimeout(() => this.onResize());
     }
   }
@@ -80,7 +93,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       }
     }
     else if (this.thresholdStyle.width !== newValue) {
-      this.thresholdStyle = { width: newValue };
+      this.thresholdStyle = newValue && !NOT_SUPPORTED ? { width: newValue } : {};
       this.thresholdWidth = undefined;
       changed = true;
     }
@@ -88,7 +101,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     if (changed) {
       this.lastSizerWidth = 0;
 
-      if (this.afterInit)
+      if (this.afterInit && !NOT_SUPPORTED)
         setTimeout(() => this.onResize());
     }
   }
@@ -96,9 +109,19 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   @Output() scaleChange = new EventEmitter<number>();
 
   onResize = debounce(() => {
-    const innerWidth = this.inner.clientWidth;
-    const innerHeight = this.inner.clientHeight;
-    const sizerWidth = Math.min(this.sizer.getBoundingClientRect().width, this.getBoundingWidth());
+    const innerWidth = this.inner.clientWidth - this.marginX * 2;
+    const innerHeight = this.inner.clientHeight - this.marginY * 2;
+    const boundingWidth = this.getBoundingWidth();
+    let sizerWidth = this.sizer.clientWidth;
+
+    this.outerStyle = {};
+
+    if (this._boundingElement === docElem)
+      sizerWidth = Math.min(sizerWidth, boundingWidth);
+    else {
+      sizerWidth = boundingWidth;
+      this.outerStyle['max-width'] = boundingWidth + 'px';
+    }
 
     if (Math.abs(sizerWidth - this.lastSizerWidth) <= 1 &&
         Math.abs(innerWidth - this.lastWidth) <= 1 &&
@@ -146,6 +169,9 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     this.sizer = this.sizerRef.nativeElement;
     this.thresholdSizer = this.thresholdSizerRef.nativeElement;
 
+    if (NOT_SUPPORTED)
+      return;
+
     this.addResizeListener(this.inner);
     this.addResizeListener(this.sizer);
     this.addResizeListener(this.thresholdSizer);
@@ -155,10 +181,17 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   ngAfterViewInit(): void {
     this.afterInit = true;
+
+    if (NOT_SUPPORTED)
+      return;
+
     setTimeout(() => this.onResize());
   }
 
   ngOnDestroy(): void {
+    if (NOT_SUPPORTED)
+      return;
+
     this.removeResizeListener(this.inner);
     this.removeResizeListener(this.sizer);
     this.removeResizeListener(this.thresholdSizer);

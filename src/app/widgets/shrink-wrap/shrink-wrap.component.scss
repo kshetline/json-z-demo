@@ -10,13 +10,8 @@
   z-index: -1000;
 }
 
-.sizer {
-  width: 100%;
-}
-
 .inner-wrapper {
-  overflow: visible;
+  overflow: hidden;
   position: relative;
-  width: -moz-fit-content;
   width: fit-content;
 }
