@@ -6,7 +6,7 @@
   <p-button label="The Works" [disabled]="isTheWorks()" (onClick)="setTheWorks()"></p-button>
 </div>
 
-<ks-shrink-wrap>
+<ks-shrink-wrap minScale="84%">
   <div class="details">
     <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
       <div class="boolean-options">
@@ -39,13 +39,25 @@
         </span>
         <span class="labeled-input">
           <label for="typePrefix">typePrefix:</label>
-          <input id="typePrefix" pInputText [class.error]="typePrefixError"
-            [(ngModel)]="typePrefix" (input)="onParsingChange()">
+          <input id="typePrefix"
+            pInputText
+            [class.error]="typePrefixError"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            [(ngModel)]="typePrefix"
+            (input)="onParsingChange()">
         </span>
         <span class="labeled-input">
           <label for="space">space:</label>
-          <input id="space" pInputText [class.error]="spaceError"
-            [(ngModel)]="space" (input)="onChange()">
+          <input id="space"
+            pInputText
+            [class.error]="spaceError"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            [(ngModel)]="space"
+            (input)="onChange()">
         </span>
       </div>
     </p-fieldset>
@@ -56,6 +68,7 @@
   <div class="col panel">
     <h3>
       <p-dropdown [options]="inputOptions" placeholder="input options"
+        class="input-options"
         [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
       <span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
     </h3>
@@ -77,7 +90,8 @@
       rows="20"
       spellcheck="false"
       (input)="onChange(true)"></textarea><br>
-    <div *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</div>
+    <div *ngIf="hasNativeBigInt;else filler" class="native-big-int-footnote">*Native BigInt available</div>
+    <ng-template #filler><div>&nbsp;</div></ng-template>
   </div>
 
   <div *ngIf="showJsonZOutput" class="col panel">

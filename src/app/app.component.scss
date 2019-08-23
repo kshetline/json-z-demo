@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  min-width: calc(320px - 1em);
+}
+
 h3 {
   position: relative;
   height: 1.4em;
@@ -24,6 +29,7 @@ h3 {
 
 .details {
   margin-right: 1em;
+  min-width: calc(320px - 1em);
   padding-top: 5px;
   width: calc(100% - 1em);
 }
@@ -56,28 +62,36 @@ h3 {
 }
 
 .panel {
+  margin-bottom: 2em;
+  min-width: 328px;
   position: relative;
 
   p-dropdown {
     margin-right: 0.25em;
+
+    &.input-options ::ng-deep .ui-dropdown {
+      min-width: 11em;
+    }
   }
 }
 
 .icons {
   color: #666;
+  font-size: 1.5em;
   position: absolute;
-  right: 1.5em;
-  top: 2.1em;
+  right: 1em;
+  top: 0.8em;
 
   i {
     cursor: pointer;
-    margin-left: 0.5em;
+    margin-left: 0.667em;
   }
 }
 
 .sample-menu {
   font-size: 1.5em;
   left: -2px;
+  margin-left: 0.444em !important;
   position: relative;
   top: 3px;
 }
@@ -122,7 +136,6 @@ h3 {
 
 .footnote {
   position: relative;
-  top: -2em;
 }
 
 .native-big-int-footnote {
@@ -133,9 +146,7 @@ h3 {
 .code {
   display: inline-block;
   font: 14px "Roboto Mono", "Courier New", monospace;
-  margin-bottom: 2em;
   margin-right: 1em;
-  min-width: calc(100vw - 3em);
   resize: none;
   width: calc(100% - 1em);
 
@@ -153,10 +164,9 @@ h3 {
   background-color: #FDD !important;
 }
 
-// Used to be `min-width: calc(280px - 2em)`, but it seems that Edge can't handle `calc` in this context.
-@media screen and (min-width: 252px) {
-  .code {
-    min-width: 280px;
+@media screen and (max-width: 480px) {
+  .panel {
+    min-width: calc(100% - 2em);
   }
 }
 
