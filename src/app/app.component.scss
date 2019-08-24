@@ -61,6 +61,10 @@ h3 {
   }
 }
 
+.panels {
+  margin-top: 1em;
+}
+
 .panel {
   margin-bottom: 2em;
   min-width: 328px;
@@ -164,9 +168,22 @@ h3 {
   background-color: #FDD !important;
 }
 
+p-button.log-button {
+  display: inline-block;
+  left: calc(50% - 78px);
+  margin-top: 1em;
+  position: relative;
+}
+
 @media screen and (max-width: 480px) {
   .panel {
     min-width: calc(100% - 2em);
+  }
+}
+
+@media (max-device-width: 480px), (max-device-height: 480px), (pointer: coarse), (pointer: none) {
+  p-button.log-button {
+    display: none;
   }
 }
 

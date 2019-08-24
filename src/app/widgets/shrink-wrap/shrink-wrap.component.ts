@@ -34,10 +34,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private lastSizerWidth = 0;
   private thresholdWidth: number;
 
-  innerStyle = {};
+  innerStyle: any = {};
   marginX = 0;
   marginY = 0;
-  outerStyle = {};
+  outerStyle: any = {};
   scale = 1;
   thresholdStyle: any = {};
 
@@ -110,14 +110,14 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   onResize = debounce(() => {
     const innerWidth = this.inner.clientWidth - this.marginX * 2;
-    const innerHeight = this.inner.clientHeight - this.marginY * 2;
+    const innerHeight = this.inner.clientHeight - this.marginY;
     const boundingWidth = this.getBoundingWidth();
     let sizerWidth = this.sizer.clientWidth;
 
-    this.outerStyle = {};
-
-    if (this._boundingElement === docElem)
+    if (this._boundingElement === docElem) {
       sizerWidth = Math.min(sizerWidth, boundingWidth);
+      delete this.outerStyle['max-width'];
+    }
     else {
       sizerWidth = boundingWidth;
       this.outerStyle['max-width'] = boundingWidth + 'px';
@@ -144,20 +144,25 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     const scaledHeight = scaledWidth * innerHeight / innerWidth;
 
     this.marginX = this.scale === 1 ? 0 : Math.ceil((scaledWidth - innerWidth) / 2);
-    this.marginY = this.scale === 1 ? 0 : Math.ceil((scaledHeight - innerHeight) / 2);
+    this.marginY = this.scale === 1 ? 0 : Math.ceil(scaledHeight - innerHeight);
 
     this.lastWidth = innerWidth;
     this.lastHeight = innerHeight;
     this.lastSizerWidth = sizerWidth;
 
-    if (this.scale === 1)
+    if (this.scale === 1) {
       this.innerStyle = {};
-    else
+      delete this.outerStyle.padding;
+    }
+    else {
       this.innerStyle = {
         transform: `scale(${this.scale})`,
-        margin: `${this.marginY}px ${this.marginX}px`,
+        'transform-origin': 'top center',
+        margin: `0 ${this.marginX}px ${this.marginY}px ${this.marginX}px`,
         'max-width': `${scalingWidth}px`
       };
+      this.outerStyle.padding = '0.05px'; // prevents margin collapse
+    }
 
     this.scaleChange.emit(this.scale);
   }, 10);

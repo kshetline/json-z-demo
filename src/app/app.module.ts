@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { FieldsetModule } from 'primeng/fieldset';
 import { InputTextModule } from 'primeng/inputtext';
@@ -29,6 +30,7 @@ import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component
     BrowserModule,
     ButtonModule,
     CheckboxModule,
+    DialogModule,
     DropdownModule,
     FieldsetModule,
     FormsModule,

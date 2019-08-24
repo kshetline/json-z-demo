@@ -89,6 +89,10 @@ function isValidTypePrefix(prefix: string): boolean {
   return prefixRegex.test(prefix);
 }
 
+function screenTooSmallForTooltip(): boolean {
+  return window.innerWidth < 480 || window.innerHeight < 480;
+}
+
 enum SampleOptions {
   JAVASCRIPT,
   JSONZ
@@ -175,6 +179,7 @@ export class AppComponent implements OnDestroy, OnInit {
   reparsedAsJSON = '';
   reparsedError = false;
   reparseOption = ReparseOptions.AS_JSON;
+  showInputInfo = false;
   showJsonZOutput = true;
   source = '';
   spaceError = false;
@@ -299,7 +304,9 @@ export class AppComponent implements OnDestroy, OnInit {
   touchToHover(event: TouchEvent): void {
     event.preventDefault();
 
-    if (this.needsMouseLeave) {
+    if (screenTooSmallForTooltip())
+      this.showInputInfo = true;
+    else if (this.needsMouseLeave) {
       this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
       this.needsMouseLeave = undefined;
     }
@@ -377,6 +384,7 @@ export class AppComponent implements OnDestroy, OnInit {
           this.newErrorTime = 0;
           this.output = err.toLocaleString();
           this.outputError = true;
+          this.sourceValue = err;
           this.reparsed = '';
         }, delayError ? ERROR_DELAY : 0);
       }
@@ -445,6 +453,7 @@ export class AppComponent implements OnDestroy, OnInit {
         this.newReparseErrorTime = 0;
         this.reparsed = `Cannot be reparsed ${reparsedAs}:\n\n` + err.toLocaleString();
         this.reparsedError = true;
+        this.reparsedValue = err;
       }, delayError ? ERROR_DELAY : 0);
     }
   }
@@ -480,6 +489,28 @@ export class AppComponent implements OnDestroy, OnInit {
     Object.assign(this.currentOptions, theWorks);
     this.typePrefix = '_';
     this.onChange();
+  }
+
+  disableSourceLogging(): boolean {
+    return !this.source || this.sourceValue === NOTHIN_NADA_ZIP;
+  }
+
+  logSource(): void {
+    if (this.outputError)
+      console.error(this.sourceValue);
+    else
+      console.log(this.sourceValue);
+  }
+
+  disableResultLogging(): boolean {
+    return !this.reparsed || this.reparsedValue === NOTHIN_NADA_ZIP;
+  }
+
+  logResult(): void {
+    if (this.outputError)
+      console.error(this.reparsedValue);
+    else
+      console.log(this.reparsedValue);
   }
 
   private updatePrefs(): void {
