@@ -90,7 +90,9 @@
   },
   "linterOptions": {
     "exclude": [
-      "src/polyfills.ts"
+      "e2e/**/*",
+      "src/polyfills.ts",
+      "src/test.ts"
     ]
   }
 }

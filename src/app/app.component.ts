@@ -9,7 +9,7 @@ import { isEqual } from 'lodash';
 import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
-import { NOTHIN_NADA_ZIP, saferEval } from './safer-eval';
+import { NO_RESULT, saferEval } from './safer-eval';
 import { sample1, sample2 } from './samples';
 
 JSONZ.setBigDecimal(BigDecimal);
@@ -370,7 +370,7 @@ export class AppComponent implements OnDestroy, OnInit {
     if (this.showJsonZOutput) {
       try {
         this.sourceValue = saferEval(this.source);
-        this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
+        this.output = this.sourceValue === NO_RESULT ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
         this.outputError = false;
         this.newErrorTime = 0;
         this.reparse(delayError);
@@ -390,7 +390,7 @@ export class AppComponent implements OnDestroy, OnInit {
       }
     }
     else {
-      this.sourceValue = (!this.source || this.source.trim() === '' ? NOTHIN_NADA_ZIP : this.source);
+      this.sourceValue = (!this.source || this.source.trim() === '' ? NO_RESULT : this.source);
       this.output = this.source;
       this.outputError = false;
       this.newErrorTime = 0;
@@ -409,7 +409,7 @@ export class AppComponent implements OnDestroy, OnInit {
       }
     }
 
-    if (this.sourceValue === NOTHIN_NADA_ZIP) {
+    if (this.sourceValue === NO_RESULT) {
       this.reparsed = '';
       this.reparsedError = false;
 
@@ -492,7 +492,7 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   disableSourceLogging(): boolean {
-    return !this.source || this.sourceValue === NOTHIN_NADA_ZIP;
+    return !this.source || this.sourceValue === NO_RESULT;
   }
 
   logSource(): void {
@@ -503,7 +503,7 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   disableResultLogging(): boolean {
-    return !this.reparsed || this.reparsedValue === NOTHIN_NADA_ZIP;
+    return !this.reparsed || this.reparsedValue === NO_RESULT;
   }
 
   logResult(): void {
