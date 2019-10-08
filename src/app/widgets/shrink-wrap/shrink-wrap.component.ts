@@ -73,10 +73,13 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     if (this._boundingElement !== newValue) {
       this.removeResizeListener(this._boundingElement);
       this._boundingElement = newValue;
-      this.addResizeListener(this._boundingElement);
 
-      if (this.afterInit && !NOT_SUPPORTED)
-        setTimeout(() => this.onResize());
+      if (!NOT_SUPPORTED) {
+        this.addResizeListener(this._boundingElement);
+
+        if (this.afterInit)
+          setTimeout(() => this.onResize());
+      }
     }
   }
 
@@ -114,10 +117,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     const boundingWidth = this.getBoundingWidth();
     let sizerWidth = this.sizer.clientWidth;
 
-    if (this._boundingElement === docElem) {
+    this.outerStyle = this.outerStyle.padding ? { padding: this.outerStyle.padding } : {};
+
+    if (this._boundingElement === docElem)
       sizerWidth = Math.min(sizerWidth, boundingWidth);
-      delete this.outerStyle['max-width'];
-    }
     else {
       sizerWidth = boundingWidth;
       this.outerStyle['max-width'] = boundingWidth + 'px';
@@ -138,7 +141,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     else if (this.thresholdWidth)
       scalingWidth = this.thresholdWidth;
 
-    this.scale = Math.min(Math.max(sizerWidth / scalingWidth, this.minScale), 1);
+    // Compensation, if needed, for the 0.05px padding used to prevent margin collapse.
+    const sizerAdjust = (sizerWidth < scalingWidth)  ? 0.1 : 0;
+
+    this.scale = Math.min(Math.max((sizerWidth - sizerAdjust) / scalingWidth, this.minScale), 1);
 
     const scaledWidth = scalingWidth * this.scale;
     const scaledHeight = scaledWidth * innerHeight / innerWidth;
