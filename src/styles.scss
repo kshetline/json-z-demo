@@ -84,16 +84,37 @@ p-button button {
   width: 100%;
 }
 
+$tooltip-background: #7AF;
+$tooltip-text-color: black;
+
 .tooltip.ui-tooltip {
   max-width: 420px;
 
   .ui-tooltip-arrow {
-    border-bottom-color: #7AF !important;
+    border-bottom-color: $tooltip-background !important;
   }
 
   .ui-tooltip-text {
-    background-color: #7AF;
-    color: black;
+    background-color: $tooltip-background;
+    color: $tooltip-text-color;
+  }
+}
+
+.tooltip-dialog.ui-dialog {
+  .ui-dialog-content, .ui-dialog-titlebar {
+    background-color: $tooltip-background;
+    border-color: #46F;
+    color: $tooltip-text-color;
+    max-width: 98vh;
+  }
+
+  .ui-dialog-content {
+    border-top: none;
+  }
+
+  .ui-dialog-titlebar {
+    font-size: 2em;
+    padding: 0.25em;
   }
 }
 

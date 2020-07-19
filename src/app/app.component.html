@@ -6,103 +6,137 @@
   <p-button label="The Works" [disabled]="isTheWorks()" (onClick)="setTheWorks()"></p-button>
 </div>
 
-<ks-shrink-wrap>
+<ks-shrink-wrap minScale="84%">
   <div class="details">
     <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
       <div class="boolean-options">
         <p-checkbox binary="true" label="extendedPrimitives"
-          [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigDecimal"
-          [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigInt"
-          [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="quoteAllKeys"
-          [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
-          [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="sparseArrays"
-          [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="trailingComma"
-          [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox>
+            [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox>
       </div>
 
       <div class="other-options">
         <span class="labeled-dropdown">
           <label>extendedTypes:</label>
           <p-dropdown [options]="extendedTypesOptions" placeholder="extendedTypes"
-            [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown>
+              [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown>
         </span>
         <span class="labeled-dropdown">
           <label>quote:</label>
           <p-dropdown [options]="quoteOptions" placeholder="quote"
-            [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown>
+              [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown>
         </span>
         <span class="labeled-input">
           <label for="typePrefix">typePrefix:</label>
-          <input id="typePrefix" pInputText [class.error]="typePrefixError"
-            [(ngModel)]="typePrefix" (input)="onParsingChange()">
+          <input id="typePrefix"
+              pInputText
+              [class.error]="typePrefixError"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              [(ngModel)]="typePrefix"
+              (input)="onParsingChange()">
         </span>
         <span class="labeled-input">
           <label for="space">space:</label>
-          <input id="space" pInputText [class.error]="spaceError"
-            [(ngModel)]="space" (input)="onChange()">
+          <input id="space"
+              pInputText
+              [class.error]="spaceError"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              [(ngModel)]="space"
+              (input)="onChange()">
         </span>
       </div>
     </p-fieldset>
   </div>
 </ks-shrink-wrap>
 
-<div class="row">
+<div class="row panels">
   <div class="col panel">
     <h3>
       <p-dropdown [options]="inputOptions" placeholder="input options"
-        [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
+          class="input-options"
+          [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
       <span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
     </h3>
     <div class="icons">
       <!--suppress AngularUndefinedBinding -->
       <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
-        [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
-        (touchstart)="touchToHover($event)"></i>
-      <p-menu #samples [popup]="true" [model]="sampleOptions" appendTo="body" (onHide)="sampleSelected($event)"></p-menu>
+          [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
+          (touchstart)="touchToHover($event)"></i>
+      <p-dialog [(visible)]="showInputInfo" [blockScroll]="true"
+          [resizable]="false" appendTo="body" styleClass="tooltip-dialog"
+          [showHeader]="true" [modal]="true" [dismissableMask]="true">
+        <div [innerHTML]="inputInfo"></div>
+      </p-dialog>
+      <p-menu #samples [popup]="true" [model]="sampleOptions" appendTo="body"
+          (onHide)="sampleSelected($event)"></p-menu>
       <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
       <i class="fas fa-trash" [class.faded]="!source" (click)="clearSource()"></i>
     </div>
     <textarea pInputTextarea
-      title="Source"
-      [(ngModel)]="source"
-      autocapitalize="off"
-      autocorrect="off"
-      class="code"
-      rows="20"
-      spellcheck="false"
-      (input)="onChange(true)"></textarea><br>
-    <div *ngIf="hasNativeBigInt" class="native-big-int-footnote">*Native BigInt available</div>
+        title="Source"
+        [(ngModel)]="source"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="code"
+        rows="20"
+        spellcheck="false"
+        (input)="onChange(true)"></textarea><br>
+    <div *ngIf="hasNativeBigInt;else filler" class="native-big-int-footnote">*Native BigInt available</div>
+    <ng-template #filler>
+      <div>&nbsp;</div>
+    </ng-template>
+    <p-button class="log-button"
+        label="Log to web console"
+        [disabled]="disableSourceLogging()"
+        (onClick)="logSource()"></p-button>
   </div>
 
   <div *ngIf="showJsonZOutput" class="col panel">
     <h3 class="json-z-output">JSON-Z output:</h3>
     <textarea pInputTextarea
-      title = "Output"
-      [ngModel]="output"
-      class="code"
-      [class.error]="outputError"
-      rows="20"
-      readonly></textarea>
+        title="Output"
+        [ngModel]="output"
+        class="code"
+        [class.error]="outputError"
+        rows="20"
+        readonly></textarea>
   </div>
 
   <div class="col panel">
     <h3>Reparsed
       <p-dropdown [options]="reparseOptions" placeholder="reparse options"
-        [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown>*:
+          [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown>
+      *:
     </h3>
     <textarea pInputTextarea
-      title="Reparsed"
-      [ngModel]="reparsed"
-      class="code"
-      [class.error]="reparsedError"
-      rows="20"
-      readonly></textarea>
+        title="Reparsed"
+        [ngModel]="reparsed"
+        class="code"
+        [class.error]="reparsedError"
+        rows="20"
+        readonly></textarea>
     <div class="footnote">*After being reparsed, displayed as JSON-Z</div>
+    <p-button class="log-button"
+        label="Log to web console"
+        [disabled]="disableResultLogging()"
+        (onClick)="logResult()"></p-button>
   </div>
 </div>

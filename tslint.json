@@ -33,6 +33,7 @@
     ],
     "no-empty": false,
     "no-trailing-whitespace": [true, "ignore-blank-lines"],
+    "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-shorthand": false,
     "object-literal-sort-keys": false,
     "one-line": [
@@ -89,7 +90,9 @@
   },
   "linterOptions": {
     "exclude": [
-      "src/polyfills.ts"
+      "e2e/**/*",
+      "src/polyfills.ts",
+      "src/test.ts"
     ]
   }
 }

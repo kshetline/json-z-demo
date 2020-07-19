@@ -7,11 +7,11 @@ let bigIntImpl = BigInteger;
 if (JSONZ.hasNativeBigInt())
   bigIntImpl = (window as any).BigInt;
 
-export const NOTHIN_NADA_ZIP = Symbol();
+export const NO_RESULT = Symbol();
 
 export function saferEval(expression: string): any {
   if (!expression || expression.trim() === '')
-    return NOTHIN_NADA_ZIP;
+    return NO_RESULT;
 
   if (!/.*\breturn\b[^'"`\}]+$/.test(expression))
     expression = `return (${expression})`;

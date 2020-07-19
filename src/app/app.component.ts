@@ -9,7 +9,7 @@ import { isEqual } from 'lodash';
 import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
-import { NOTHIN_NADA_ZIP, saferEval } from './safer-eval';
+import { NO_RESULT, saferEval } from './safer-eval';
 import { sample1, sample2 } from './samples';
 
 JSONZ.setBigDecimal(BigDecimal);
@@ -87,6 +87,10 @@ catch (err) {}
 
 function isValidTypePrefix(prefix: string): boolean {
   return prefixRegex.test(prefix);
+}
+
+function screenTooSmallForTooltip(): boolean {
+  return window.innerWidth < 480 || window.innerHeight < 480;
 }
 
 enum SampleOptions {
@@ -175,6 +179,7 @@ export class AppComponent implements OnDestroy, OnInit {
   reparsedAsJSON = '';
   reparsedError = false;
   reparseOption = ReparseOptions.AS_JSON;
+  showInputInfo = false;
   showJsonZOutput = true;
   source = '';
   spaceError = false;
@@ -299,7 +304,9 @@ export class AppComponent implements OnDestroy, OnInit {
   touchToHover(event: TouchEvent): void {
     event.preventDefault();
 
-    if (this.needsMouseLeave) {
+    if (screenTooSmallForTooltip())
+      this.showInputInfo = true;
+    else if (this.needsMouseLeave) {
       this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
       this.needsMouseLeave = undefined;
     }
@@ -363,7 +370,7 @@ export class AppComponent implements OnDestroy, OnInit {
     if (this.showJsonZOutput) {
       try {
         this.sourceValue = saferEval(this.source);
-        this.output = this.sourceValue === NOTHIN_NADA_ZIP ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
+        this.output = this.sourceValue === NO_RESULT ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
         this.outputError = false;
         this.newErrorTime = 0;
         this.reparse(delayError);
@@ -377,12 +384,13 @@ export class AppComponent implements OnDestroy, OnInit {
           this.newErrorTime = 0;
           this.output = err.toLocaleString();
           this.outputError = true;
+          this.sourceValue = err;
           this.reparsed = '';
         }, delayError ? ERROR_DELAY : 0);
       }
     }
     else {
-      this.sourceValue = (!this.source || this.source.trim() === '' ? NOTHIN_NADA_ZIP : this.source);
+      this.sourceValue = (!this.source || this.source.trim() === '' ? NO_RESULT : this.source);
       this.output = this.source;
       this.outputError = false;
       this.newErrorTime = 0;
@@ -401,7 +409,7 @@ export class AppComponent implements OnDestroy, OnInit {
       }
     }
 
-    if (this.sourceValue === NOTHIN_NADA_ZIP) {
+    if (this.sourceValue === NO_RESULT) {
       this.reparsed = '';
       this.reparsedError = false;
 
@@ -445,6 +453,7 @@ export class AppComponent implements OnDestroy, OnInit {
         this.newReparseErrorTime = 0;
         this.reparsed = `Cannot be reparsed ${reparsedAs}:\n\n` + err.toLocaleString();
         this.reparsedError = true;
+        this.reparsedValue = err;
       }, delayError ? ERROR_DELAY : 0);
     }
   }
@@ -480,6 +489,28 @@ export class AppComponent implements OnDestroy, OnInit {
     Object.assign(this.currentOptions, theWorks);
     this.typePrefix = '_';
     this.onChange();
+  }
+
+  disableSourceLogging(): boolean {
+    return !this.source || this.sourceValue === NO_RESULT;
+  }
+
+  logSource(): void {
+    if (this.outputError)
+      console.error(this.sourceValue);
+    else
+      console.log(this.sourceValue);
+  }
+
+  disableResultLogging(): boolean {
+    return !this.reparsed || this.reparsedValue === NO_RESULT;
+  }
+
+  logResult(): void {
+    if (this.outputError)
+      console.error(this.reparsedValue);
+    else
+      console.log(this.reparsedValue);
   }
 
   private updatePrefs(): void {

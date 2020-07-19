@@ -19,6 +19,7 @@ export const sample1 =
   return obj;
 })()`;
 
+// noinspection SpellCheckingInspection
 export const sample2 =
 `{
   // comments
