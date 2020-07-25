@@ -47,6 +47,7 @@ No \\\\n's!",
   // bigDecimal: 3.1415926535897932384626433832795028841971693993751m,
   // fixedBigDecimal: 2.718281828459045235360287471352662d,
   bigDecimal: _BigDecimal('3.141592653589793238462643383279'),
+  fixedBigDecimal: _FixedBigDecimal('2.718281828459045235360287471352662'),
   trailingComma: 'in objects', andIn: ['arrays',],
   sparseArray: [1, 2, , , 5],
   // Function-like extended types. This is revived as a JavaScript \`Date\` object

@@ -1,7 +1,9 @@
 import * as BigInteger from 'big-integer';
 import * as BigDecimal from 'decimal.js';
 import * as JSONZ from 'json-z';
-import { FixedBigDecimal } from './app.component';
+
+// tslint:disable-next-line:variable-name
+export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
 
 let bigIntImpl = BigInteger;
 

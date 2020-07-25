@@ -9,11 +9,8 @@ import { isEqual } from 'lodash';
 import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
-import { NO_RESULT, saferEval } from './safer-eval';
+import { FixedBigDecimal, NO_RESULT, saferEval } from './safer-eval';
 import { sample1, sample2 } from './samples';
-
-// tslint:disable-next-line:variable-name
-export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
 
 JSONZ.setBigDecimal(BigDecimal);
 JSONZ.setFixedBigDecimal(FixedBigDecimal);
