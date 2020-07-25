@@ -12,6 +12,7 @@ import { InputOptions, PreferencesService, ReparseOptions } from './preferences.
 import { NO_RESULT, saferEval } from './safer-eval';
 import { sample1, sample2 } from './samples';
 
+// tslint:disable-next-line:variable-name
 export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
 
 JSONZ.setBigDecimal(BigDecimal);
