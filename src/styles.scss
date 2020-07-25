@@ -36,17 +36,33 @@ h1 {
   }
 }
 
-.github span {
-  padding-left: 0.33em;
+.github {
+  background-color: #E0E4EE;
+  border-radius: 0.25em;
+  padding-left: 0.4em;
+  padding-top: 0.4em;
   position: relative;
-  top: -5px;
+  top: -0.25em;
+
+  span {
+    padding-left: 0.33em;
+    position: relative;
+    top: -5px;
+  }
 }
 
 .api {
+  background-color: #E0E4EE;
+  border-radius: 0.25em;
+  padding-left: 0.4em;
+  padding-top: 0.4em;
+  position: relative;
+  top: -0.25em;
+
   i {
     color: #197AB7;
     font-size: 22px;
-    margin: 0.5em 0.25em 0.5em 0.25em;
+    margin: 0 0.25em 0 0;
     position: relative;
     top: -2px;
   }
