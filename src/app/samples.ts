@@ -13,7 +13,8 @@ export const sample1 =
     date: new Date("1969-07-20T20:17:40Z"),
     regex: /\\d+[a-z]/i,
     bigInt: BigInt('-9223372036854775808'),
-    bigDecimal: BigDecimal('3.141592653589793238462643383279')
+    bigDecimal: BigDecimal('3.1415926535897932384626433832795028841971693993751'),
+    fixedBigDecimal: FixedBigDecimal('2.718281828459045235360287471352662')
   }
 
   return obj;
@@ -43,7 +44,8 @@ No \\\\n's!",
   // bigInt: -9223372036854775808n,
   bigInt: _BigInt("-9223372036854775808"),
   // Line below commented out to allow assisted JSON-P parsing
-  // bigDecimal: 3.141592653589793238462643383279m,
+  // bigDecimal: 3.1415926535897932384626433832795028841971693993751m,
+  // fixedBigDecimal: 2.718281828459045235360287471352662d,
   bigDecimal: _BigDecimal('3.141592653589793238462643383279'),
   trailingComma: 'in objects', andIn: ['arrays',],
   sparseArray: [1, 2, , , 5],

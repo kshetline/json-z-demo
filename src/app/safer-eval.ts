@@ -1,6 +1,7 @@
 import * as BigInteger from 'big-integer';
 import * as BigDecimal from 'decimal.js';
 import * as JSONZ from 'json-z';
+import { FixedBigDecimal } from './app.component';
 
 let bigIntImpl = BigInteger;
 
@@ -13,11 +14,9 @@ export function saferEval(expression: string): any {
   if (!expression || expression.trim() === '')
     return NO_RESULT;
 
-  if (!/.*\breturn\b[^'"`\}]+$/.test(expression))
+  if (!/.*\breturn\b[^'"`}]+$/.test(expression))
     expression = `return (${expression})`;
 
-  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console',
-    'BigInt', 'BigDecimal',
-    expression)(null, null, null, null, null, null,
-      bigIntImpl, BigDecimal);
+  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console', 'BigInt', 'BigDecimal', 'FixedBigDecimal',
+    expression)(null, null, null, null, null, null, bigIntImpl, BigDecimal, FixedBigDecimal);
 }

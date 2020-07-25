@@ -12,7 +12,10 @@ import { InputOptions, PreferencesService, ReparseOptions } from './preferences.
 import { NO_RESULT, saferEval } from './safer-eval';
 import { sample1, sample2 } from './samples';
 
+export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
+
 JSONZ.setBigDecimal(BigDecimal);
+JSONZ.setFixedBigDecimal(FixedBigDecimal);
 
 if (!JSONZ.hasBigInt())
   JSONZ.setBigInt(BigIntAlt);
@@ -26,6 +29,7 @@ const compatibleOptions: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.OFF,
   primitiveBigDecimal: false,
   primitiveBigInt: false,
+  primitiveFixedBigDecimal: false,
   quote: Quote.DOUBLE,
   quoteAllKeys: true,
   revealHiddenArrayProperties: false,
@@ -40,6 +44,7 @@ const relaxedOptions: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.OFF,
   primitiveBigDecimal: false,
   primitiveBigInt: true,
+  primitiveFixedBigDecimal: false,
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
@@ -54,6 +59,7 @@ const theWorks: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.AS_FUNCTIONS,
   primitiveBigDecimal: true,
   primitiveBigInt: true,
+  primitiveFixedBigDecimal: true,
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
@@ -255,6 +261,7 @@ export class AppComponent implements OnDestroy, OnInit {
       this.inputOption = prefs.inputOption || InputOptions.AS_JAVASCRIPT;
       this.inputInfo = (this.inputOption === InputOptions.AS_JAVASCRIPT ? inputInfoJavaScript : inputInfoJsonz);
       this.currentOptions = prefs.options || this.currentOptions;
+      this.currentOptions.primitiveFixedBigDecimal = this.currentOptions.primitiveBigDecimal;
       this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON;
       this.source = prefs.source || '';
       this.space = prefs.space || 0;
@@ -354,6 +361,8 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   onChange(delayError = false, updateThePrefs = true): void {
+    this.currentOptions.primitiveFixedBigDecimal = this.currentOptions.primitiveBigDecimal;
+
     if (updateThePrefs)
       this.updatePrefs();
 
