@@ -14,12 +14,16 @@
             [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigDecimal"
             [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
+        <p-checkbox binary="true" label="primitiveFixedBigDecimal"
+            [(ngModel)]="currentOptions.primitiveFixedBigDecimal" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigInt"
             [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="quoteAllKeys"
             [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
             [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
+        <p-checkbox binary="true" label="reviveTypedContainers"
+            [(ngModel)]="reviveTypedContainers" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="sparseArrays"
             [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="trailingComma"

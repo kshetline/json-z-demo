@@ -20,6 +20,7 @@ export interface Preferences {
   inputOption?: InputOptions;
   options?: JsonZOptions;
   reparseOption?: ReparseOptions;
+  reviveTypedContainers?: boolean;
   source?: string;
   space?: string | number;
 }

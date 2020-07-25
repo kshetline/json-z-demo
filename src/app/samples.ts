@@ -40,12 +40,7 @@ No \\\\n's!",
   negativeZero: -0,
   positiveSign: +1,
   notDefined: undefined,
-  // Line below commented out to allow assisted JSON-P parsing
-  // bigInt: -9223372036854775808n,
   bigInt: _BigInt("-9223372036854775808"),
-  // Line below commented out to allow assisted JSON-P parsing
-  // bigDecimal: 3.1415926535897932384626433832795028841971693993751m,
-  // fixedBigDecimal: 2.718281828459045235360287471352662d,
   bigDecimal: _BigDecimal('3.141592653589793238462643383279'),
   fixedBigDecimal: _FixedBigDecimal('2.718281828459045235360287471352662'),
   trailingComma: 'in objects', andIn: ['arrays',],
@@ -53,8 +48,13 @@ No \\\\n's!",
   // Function-like extended types. This is revived as a JavaScript \`Date\` object
   date: _Date('2019-07-28T08:49:58.202Z'),
   // Type container extended types. This is optionally revived as a JavaScript \`Date\` object
-  date2: {"_$_": "Date", "_$_value": "2019-07-28T08:49:58.202Z"},
+  date2: {"_$_": "Date", "_$_value": "2020-07-25T15:44:05.014Z"},
   // A relatively compact way to send and receive binary data
   buffer: _Uint8Array('T25lLiBUd28uIEZpdmUuLi4gSSBtZWFuIHRocmVlIQ=='),
   "backwardsCompatible": "with JSON",
 }`;
+
+export const sample3 = sample2
+  .replace(/(bigInt: )[^,]+?,/, '$1-9223372036854775808n,')
+  .replace(/(bigDecimal: )[^,]+?,/, '$13.1415926535897932384626433832795028841971693993751m,')
+  .replace(/(fixedBigDecimal: )[^,]+?,/, '$12.718281828459045235360287471352662d,');
