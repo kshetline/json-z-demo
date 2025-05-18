@@ -1,15 +1,7 @@
-import * as BigInteger from 'big-integer';
-import * as BigDecimal from 'decimal.js';
-import * as JSONZ from 'json-z';
+import { Decimal as DecimalJS } from 'decimal.js';
+import { Decimal } from 'proposal-decimal';
 
 // tslint:disable-next-line:variable-name
-export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
-
-let bigIntImpl = BigInteger;
-
-if (JSONZ.hasNativeBigInt())
-  bigIntImpl = (window as any).BigInt;
-
 export const NO_RESULT = Symbol();
 
 export function saferEval(expression: string): any {
@@ -19,6 +11,6 @@ export function saferEval(expression: string): any {
   if (!/.*\breturn\b[^'"`}]+$/.test(expression))
     expression = `return (${expression})`;
 
-  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console', 'BigInt', 'BigDecimal', 'FixedBigDecimal',
-    expression)(null, null, null, null, null, null, bigIntImpl, BigDecimal, FixedBigDecimal);
+  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console', 'DecimalJS', 'Decimal',
+    expression)(null, null, null, null, null, null, DecimalJS, Decimal);
 }

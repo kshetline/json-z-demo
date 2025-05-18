@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { addResizeListener, removeResizeListener } from 'detect-resize';
-import { debounce } from 'lodash';
+import { isString } from '@tubular/util';
+import { NgStyle } from '@angular/common';
 
 const docElem = document.documentElement;
 const DEFAULT_MIN = 0.75;
 
 // This component fails to work (sometimes in a very dramatic fashion, with the content it's
 // supposed to be showing doing a dramatic animated dive off the screen!) on the original
-// non-Chromium version of Microsoft Edge. Therefore we want to disable it for that browser.
+// non-Chromium version of Microsoft Edge. Therefore, we want to disable it for that browser.
 // At the time of this writing, the user agent string for the original Edge has the word
 // "Edge" fully spelled out, while the beta Chromium Edge simply has "Edg". If that changes
 // in the future, the test for Edge below will have to be updated.
@@ -20,11 +20,14 @@ const NOT_SUPPORTED = / Edge\//.test(navigator.userAgent) ||
 @Component({
   selector: 'ks-shrink-wrap',
   templateUrl: './shrink-wrap.component.html',
-  styleUrls: ['./shrink-wrap.component.scss']
+  styleUrls: ['./shrink-wrap.component.scss'],
+  imports: [NgStyle],
+  standalone: true
 })
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private afterInit = false;
   private _boundingElement: HTMLElement = docElem;
+  private debouncer: any;
   private _minScale = DEFAULT_MIN;
   private inner: HTMLDivElement;
   private sizer: HTMLDivElement;
@@ -32,6 +35,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private lastWidth = 0;
   private lastHeight = 0;
   private lastSizerWidth = 0;
+  private resizeListener = new ResizeObserver(() => this.onResize());
   private thresholdWidth: number;
 
   innerStyle: any = {};
@@ -45,9 +49,9 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild('sizer', { static: true }) sizerRef: ElementRef;
   @ViewChild('thresholdSizer', { static: true }) thresholdSizerRef: ElementRef;
 
-  @Input() get minScale(): number { return this._minScale; }
-  set minScale(newValue: number) {
-    if (typeof newValue as any === 'string') {
+  @Input() get minScale(): number | string { return this._minScale; }
+  set minScale(newValue: number | string) {
+    if (isString(newValue)) {
       const $ = /([\d.]+)(%)?/.exec(newValue as any as string);
 
       if ($) {
@@ -58,10 +62,10 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       }
     }
 
-    if (isNaN(newValue) || !newValue)
+    if (isNaN(newValue as number) || !newValue)
       this._minScale = DEFAULT_MIN;
     else
-      this._minScale = Math.min(Math.max(newValue, 0.01), 1);
+      this._minScale = Math.min(Math.max(newValue as number, 0.01), 1);
   }
 
   @Input() set boundingElement(newValue: string | HTMLElement) {
@@ -111,7 +115,14 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   @Output() scaleChange = new EventEmitter<number>();
 
-  onResize = debounce(() => {
+  private onResize = (): void => {
+    if (!this.debouncer)
+      this.debouncer = setTimeout(() => this.onResizeAux(), 10);
+  };
+
+  private onResizeAux(): void {
+    this.debouncer = undefined;
+
     const innerWidth = this.inner.clientWidth - this.marginX * 2;
     const innerHeight = this.inner.clientHeight - this.marginY;
     const boundingWidth = this.getBoundingWidth();
@@ -144,7 +155,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     // Compensation, if needed, for the 0.05px padding used to prevent margin collapse.
     const sizerAdjust = (sizerWidth < scalingWidth)  ? 0.1 : 0;
 
-    this.scale = Math.min(Math.max((sizerWidth - sizerAdjust) / scalingWidth, this.minScale), 1);
+    this.scale = Math.min(Math.max((sizerWidth - sizerAdjust) / scalingWidth, this.minScale as number), 1);
 
     const scaledWidth = scalingWidth * this.scale;
     const scaledHeight = scaledWidth * innerHeight / innerWidth;
@@ -171,7 +182,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     this.scaleChange.emit(this.scale);
-  }, 10);
+  }
 
   constructor() { }
 
@@ -233,13 +244,13 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     return width;
   }
 
-  private addResizeListener(elem): void {
+  private addResizeListener(elem: HTMLElement): void {
     if (elem !== docElem)
-      addResizeListener(elem, this.onResize);
+      this.resizeListener.observe(elem);
   }
 
-  private removeResizeListener(elem): void {
+  private removeResizeListener(elem: HTMLElement): void {
     if (elem !== docElem)
-      removeResizeListener(elem, this.onResize);
+      this.resizeListener.unobserve(elem);
   }
 }

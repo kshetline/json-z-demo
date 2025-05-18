@@ -1,22 +1,30 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import * as BigIntAlt from 'big-integer';
-import * as BigDecimal from 'decimal.js';
+import { Decimal as DecimalJS } from 'decimal.js';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
-import { isEqual } from 'lodash';
 import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
-import { FixedBigDecimal, NO_RESULT, saferEval } from './safer-eval';
+import { NO_RESULT, saferEval } from './safer-eval';
+import { Decimal } from 'proposal-decimal';
 import { sample1, sample2, sample3 } from './samples';
+import { isEqual } from '@tubular/util';
+import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { FieldsetModule } from 'primeng/fieldset';
+import { DropdownModule } from 'primeng/dropdown';
+import { DialogModule } from 'primeng/dialog';
+import { MenuModule } from 'primeng/menu';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { NgIf } from '@angular/common';
 
-JSONZ.setBigDecimal(BigDecimal);
-JSONZ.setFixedBigDecimal(FixedBigDecimal);
-
-if (!JSONZ.hasBigInt())
-  JSONZ.setBigInt(BigIntAlt);
+JSONZ.setBigDecimal(DecimalJS);
+JSONZ.setFixedBigDecimal(Decimal);
 
 JSONZ.setOptions(JSONZ.OptionSet.THE_WORKS);
 
@@ -123,7 +131,10 @@ are available for making values compatible with assisted JSONP.`;
 @Component({
   selector: 'jz-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  imports: [ButtonModule, CheckboxModule, DialogModule, DropdownModule, FieldsetModule, FormsModule, HttpClientModule,
+    MenuModule, NgIf, ShrinkWrapComponent, InputTextModule, InputTextareaModule],
+  standalone: true
 })
 export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
@@ -243,13 +254,10 @@ export class AppComponent implements OnDestroy, OnInit {
       this.typePrefixError = false;
   }
 
-  // noinspection JSMethodCanBeStatic
-  get hasNativeBigInt(): boolean { return JSONZ.hasNativeBigInt(); }
-
   constructor(
-    private http: HttpClient,
+    http: HttpClient,
     private prefsService: PreferencesService,
-    private sanitizer: DomSanitizer,
+    sanitizer: DomSanitizer,
   ) {
     http.get('assets/banner.html', { responseType: 'text' })
       .subscribe(content => this.banner = sanitizer.bypassSecurityTrustHtml(content.toString()));
