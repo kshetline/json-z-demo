@@ -3,9 +3,17 @@
   src: url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 }
 
+:root {
+  --font-family: "Open Sans", OpenSans2, "Helvetica Neue";
+}
+
+html {
+  font-size: 14px;
+}
+
 body {
   color: #333C40;
-  font-family: "Open Sans", OpenSans2, "Helvetica Neue", sans-serif;
+  font-family: var(--font-family), sans-serif;
   font-weight: 400;
   font-size: 14px;
   margin: 1em 0 1em 1em;
@@ -27,6 +35,11 @@ h1 {
   justify-content: center;
   width: calc(100% - 1em);
 
+  a {
+    color: #007ad9;
+    text-decoration: none;
+  }
+
   a > img {
     margin: 0.5em;
   }
@@ -36,17 +49,33 @@ h1 {
   }
 }
 
-.github span {
-  padding-left: 0.33em;
+.github {
+  background-color: #E0E4EE;
+  border-radius: 0.25em;
+  padding-left: 0.4em;
+  padding-top: 0.4em;
   position: relative;
-  top: -5px;
+  top: -0.25em;
+
+  span {
+    padding-left: 0.33em;
+    position: relative;
+    top: -5px;
+  }
 }
 
 .api {
+  background-color: #E0E4EE;
+  border-radius: 0.25em;
+  padding-left: 0.4em;
+  padding-top: 0.4em;
+  position: relative;
+  top: -0.25em;
+
   i {
     color: #197AB7;
     font-size: 22px;
-    margin: 0.5em 0.25em 0.5em 0.25em;
+    margin: 0 0.25em 0 0;
     position: relative;
     top: -2px;
   }
@@ -82,6 +111,10 @@ h2 {
 
 p-button button {
   width: 100%;
+}
+
+.wider .p-dropdown {
+  min-width: 12.5em;
 }
 
 $tooltip-background: #7AF;

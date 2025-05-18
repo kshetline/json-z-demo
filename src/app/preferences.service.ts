@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as JSONZ from 'json-z';
 import { JsonZOptions } from 'json-z';
-import { cloneDeep, debounce } from 'lodash';
+import { clone } from '@tubular/util';
 
 export enum InputOptions {
   AS_JAVASCRIPT,
@@ -20,15 +20,17 @@ export interface Preferences {
   inputOption?: InputOptions;
   options?: JsonZOptions;
   reparseOption?: ReparseOptions;
+  reviveTypedContainers?: boolean;
   source?: string;
   space?: string | number;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class PreferencesService {
   private prefs: Preferences;
-  private debouncedSaveSettings = debounce(() =>
-      localStorage.setItem('jsonz-prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS)), 2000);
+  private settingsTimer: any;
 
   constructor() {
     const prefsStr = localStorage.getItem('jsonz-prefs');
@@ -45,11 +47,17 @@ export class PreferencesService {
   }
 
   get(): Preferences {
-    return this.prefs && cloneDeep(this.prefs);
+    return this.prefs && clone(this.prefs);
   }
 
   set(newPrefs: Preferences): void {
-    this.prefs = newPrefs && cloneDeep(newPrefs);
-    this.debouncedSaveSettings();
+    this.prefs = newPrefs && clone(newPrefs);
+
+    if (!this.settingsTimer) {
+      this.settingsTimer = setTimeout(() => {
+        this.settingsTimer = undefined;
+        localStorage.setItem('jsonz-prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS))
+      }, 2000);
+    }
   }
 }

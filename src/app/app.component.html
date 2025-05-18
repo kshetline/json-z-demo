@@ -1,7 +1,7 @@
 <div [innerHTML]="banner"></div>
 
 <div class="option-sets">
-  <p-button label="Most Compatible" [disabled]="isCompatible()" (onClick)="setCompatible()"></p-button>
+  <p-button label="Most&nbsp;Compatible" [disabled]="isCompatible()" (onClick)="setCompatible()"></p-button>
   <p-button label="Relaxed" [disabled]="isRelaxed()" (onClick)="setRelaxed()"></p-button>
   <p-button label="The Works" [disabled]="isTheWorks()" (onClick)="setTheWorks()"></p-button>
 </div>
@@ -14,12 +14,16 @@
             [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigDecimal"
             [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
+        <p-checkbox binary="true" label="primitiveFixedBigDecimal"
+            [(ngModel)]="currentOptions.primitiveFixedBigDecimal" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="primitiveBigInt"
             [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="quoteAllKeys"
             [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
             [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
+        <p-checkbox binary="true" label="reviveTypedContainers"
+            [(ngModel)]="reviveTypedContainers" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="sparseArrays"
             [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
         <p-checkbox binary="true" label="trailingComma"
@@ -29,12 +33,12 @@
       <div class="other-options">
         <span class="labeled-dropdown">
           <label>extendedTypes:</label>
-          <p-dropdown [options]="extendedTypesOptions" placeholder="extendedTypes"
+          <p-dropdown class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes"
               [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown>
         </span>
         <span class="labeled-dropdown">
           <label>quote:</label>
-          <p-dropdown [options]="quoteOptions" placeholder="quote"
+          <p-dropdown class="wider" [options]="quoteOptions" placeholder="quote"
               [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown>
         </span>
         <span class="labeled-input">
@@ -71,8 +75,7 @@
     <h3>
       <p-dropdown [options]="inputOptions" placeholder="input options"
           class="input-options"
-          [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>
-      <span *ngIf="hasNativeBigInt" class="native-big-int-star">*</span>:
+          [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>:
     </h3>
     <div class="icons">
       <!--suppress AngularUndefinedBinding -->
@@ -99,10 +102,7 @@
         rows="20"
         spellcheck="false"
         (input)="onChange(true)"></textarea><br>
-    <div *ngIf="hasNativeBigInt;else filler" class="native-big-int-footnote">*Native BigInt available</div>
-    <ng-template #filler>
-      <div>&nbsp;</div>
-    </ng-template>
+    <div>&nbsp;</div>
     <p-button class="log-button"
         label="Log to web console"
         [disabled]="disableSourceLogging()"

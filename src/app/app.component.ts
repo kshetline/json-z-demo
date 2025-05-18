@@ -1,24 +1,30 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import * as BigIntAlt from 'big-integer';
-import * as BigDecimal from 'decimal.js';
+import { Decimal as DecimalJS } from 'decimal.js';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
-import { isEqual } from 'lodash';
 import { MenuItem } from 'primeng/api';
 
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
 import { NO_RESULT, saferEval } from './safer-eval';
-import { sample1, sample2 } from './samples';
+import { Decimal } from 'proposal-decimal';
+import { sample1, sample2, sample3 } from './samples';
+import { isEqual } from '@tubular/util';
+import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { FieldsetModule } from 'primeng/fieldset';
+import { DropdownModule } from 'primeng/dropdown';
+import { DialogModule } from 'primeng/dialog';
+import { MenuModule } from 'primeng/menu';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { NgIf } from '@angular/common';
 
-export const FixedBigDecimal = (BigDecimal as any).clone().set({precision: 34, minE: -6143, maxE: 6144});
-
-JSONZ.setBigDecimal(BigDecimal);
-JSONZ.setFixedBigDecimal(FixedBigDecimal);
-
-if (!JSONZ.hasBigInt())
-  JSONZ.setBigInt(BigIntAlt);
+JSONZ.setBigDecimal(DecimalJS);
+JSONZ.setFixedBigDecimal(Decimal);
 
 JSONZ.setOptions(JSONZ.OptionSet.THE_WORKS);
 
@@ -101,6 +107,7 @@ function screenTooSmallForTooltip(): boolean {
 
 enum SampleOptions {
   JAVASCRIPT,
+  JSONZ_JSONP,
   JSONZ
 }
 
@@ -124,7 +131,10 @@ are available for making values compatible with assisted JSONP.`;
 @Component({
   selector: 'jz-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  imports: [ButtonModule, CheckboxModule, DialogModule, DropdownModule, FieldsetModule, FormsModule, HttpClientModule,
+    MenuModule, NgIf, ShrinkWrapComponent, InputTextModule, InputTextareaModule],
+  standalone: true
 })
 export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
@@ -172,11 +182,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
   sampleOptions: MenuItem[] = [
     { label: 'JavaScript sample', command: () => this.sampleSelected(SampleOptions.JAVASCRIPT) },
+    { label: 'JSON-Z for JSONP sample', command: () => this.sampleSelected(SampleOptions.JSONZ_JSONP) },
     { label: 'JSON-Z sample', command: () => this.sampleSelected(SampleOptions.JSONZ) }
   ];
 
   banner: SafeHtml;
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
+  reviveTypedContainers = true;
   inputInfo = inputInfoJavaScript;
   inputOption = InputOptions.AS_JAVASCRIPT;
   output = '';
@@ -242,13 +254,10 @@ export class AppComponent implements OnDestroy, OnInit {
       this.typePrefixError = false;
   }
 
-  // noinspection JSMethodCanBeStatic
-  get hasNativeBigInt(): boolean { return JSONZ.hasNativeBigInt(); }
-
   constructor(
-    private http: HttpClient,
+    http: HttpClient,
     private prefsService: PreferencesService,
-    private sanitizer: DomSanitizer,
+    sanitizer: DomSanitizer,
   ) {
     http.get('assets/banner.html', { responseType: 'text' })
       .subscribe(content => this.banner = sanitizer.bypassSecurityTrustHtml(content.toString()));
@@ -258,11 +267,11 @@ export class AppComponent implements OnDestroy, OnInit {
 
     if (prefs) {
       this._detailsCollapsed = !!prefs.detailsCollapsed;
-      this.inputOption = prefs.inputOption || InputOptions.AS_JAVASCRIPT;
+      this.inputOption = prefs.inputOption ?? InputOptions.AS_JAVASCRIPT;
       this.inputInfo = (this.inputOption === InputOptions.AS_JAVASCRIPT ? inputInfoJavaScript : inputInfoJsonz);
       this.currentOptions = prefs.options || this.currentOptions;
-      this.currentOptions.primitiveFixedBigDecimal = this.currentOptions.primitiveBigDecimal;
-      this.reparseOption = prefs.reparseOption || ReparseOptions.AS_JSON;
+      this.reparseOption = prefs.reparseOption ?? ReparseOptions.AS_JSON;
+      this.reviveTypedContainers = prefs.reviveTypedContainers ?? this.reviveTypedContainers;
       this.source = prefs.source || '';
       this.space = prefs.space || 0;
       this.typePrefix = this.currentOptions.typePrefix;
@@ -298,10 +307,18 @@ export class AppComponent implements OnDestroy, OnInit {
         this.setCompatible();
         break;
 
-      case SampleOptions.JSONZ:
+      case SampleOptions.JSONZ_JSONP:
         this.inputOption = InputOptions.AS_JSONZ;
         this.reparseOption = ReparseOptions.AS_JSONP_ASSISTED;
         this.onInputOptionChange(sample2);
+        this.onParsingChange(false);
+        this.setTheWorks();
+        break;
+
+      case SampleOptions.JSONZ:
+        this.inputOption = InputOptions.AS_JSONZ;
+        this.reparseOption = ReparseOptions.AS_JSONZ;
+        this.onInputOptionChange(sample3);
         this.onParsingChange(false);
         this.setTheWorks();
         break;
@@ -361,8 +378,6 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   onChange(delayError = false, updateThePrefs = true): void {
-    this.currentOptions.primitiveFixedBigDecimal = this.currentOptions.primitiveBigDecimal;
-
     if (updateThePrefs)
       this.updatePrefs();
 
@@ -434,7 +449,7 @@ export class AppComponent implements OnDestroy, OnInit {
       }
       else if (this.reparseOption === ReparseOptions.AS_JSONZ) {
         reparsedAs = 'using JSONZ';
-        this.reparsedValue = JSONZ.parse(this.output);
+        this.reparsedValue = JSONZ.parse(this.output, { reviveTypedContainers: this.reviveTypedContainers });
       }
       else {
         reparsedAs = 'using JSONP';
@@ -468,20 +483,21 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   isCompatible(): boolean {
-    return isEqual(this.currentOptions, compatibleOptions);
+    return isEqual(this.currentOptions, compatibleOptions) && !this.reviveTypedContainers;
   }
 
   isRelaxed(): boolean {
-    return isEqual(this.currentOptions, relaxedOptions);
+    return isEqual(this.currentOptions, relaxedOptions) && this.reviveTypedContainers;
   }
 
   isTheWorks(): boolean {
-    return isEqual(this.currentOptions, theWorks);
+    return isEqual(this.currentOptions, theWorks) && this.reviveTypedContainers;
   }
 
   setCompatible(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, compatibleOptions);
+    this.reviveTypedContainers = false;
     this.typePrefix = '_';
     this.onChange();
   }
@@ -489,6 +505,7 @@ export class AppComponent implements OnDestroy, OnInit {
   setRelaxed(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, relaxedOptions);
+    this.reviveTypedContainers = true;
     this.typePrefix = '_';
     this.onChange();
   }
@@ -496,6 +513,7 @@ export class AppComponent implements OnDestroy, OnInit {
   setTheWorks(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, theWorks);
+    this.reviveTypedContainers = true;
     this.typePrefix = '_';
     this.onChange();
   }
@@ -527,6 +545,7 @@ export class AppComponent implements OnDestroy, OnInit {
       detailsCollapsed: this.detailsCollapsed,
       inputOption: this.inputOption,
       options: this.currentOptions,
+      reviveTypedContainers: this.reviveTypedContainers,
       reparseOption: this.reparseOption,
       source: this.source,
       space: this.space
