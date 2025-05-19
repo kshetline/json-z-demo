@@ -9,12 +9,12 @@ export const sample1 =
     array: a,
     str1: "Doesn't need to be escaped, or does it?",
     str2: 'Say "cheese"!',
-    str3: \`"double quotes"  and 'single quotes'\`,
+    str3: \`"double quotes" and 'single quotes'\`,
     date: new Date("1969-07-20T20:17:40Z"),
     regex: /\\d+[a-z]/i,
     bigInt: BigInt('-9223372036854775808'),
     bigDecimal: BigDecimal('3.1415926535897932384626433832795028841971693993751'),
-    fixedBigDecimal: FixedBigDecimal('2.718281828459045235360287471352662')
+    decimal: new Decimal('2.718281828459045235360287471352662')
   }
 
   return obj;
@@ -26,7 +26,7 @@ export const sample2 =
   // comments
   unquoted: 'and you can quote me on that',
   singleQuotes: 'I can use "double quotes" here',
-  backtickQuotes: \`I can use "double quotes"  and 'single quotes' here\`,
+  backtickQuotes: \`I can use "double quotes" $\\{ and 'single quotes' here\`,
   lineBreaks: "Look, Mom! \\
 No \\\\n's!",
   // Underscore separators in numbers allowed
@@ -42,7 +42,7 @@ No \\\\n's!",
   notDefined: undefined,
   bigInt: _BigInt("-9223372036854775808"),
   bigDecimal: _BigDecimal('3.141592653589793238462643383279'),
-  fixedBigDecimal: _FixedBigDecimal('2.718281828459045235360287471352662'),
+  decimal: _Decimal('2.718281828459045235360287471352662'),
   trailingComma: 'in objects', andIn: ['arrays',],
   sparseArray: [1, 2, , , 5],
   // Function-like extended types. This is revived as a JavaScript \`Date\` object
@@ -57,4 +57,4 @@ No \\\\n's!",
 export const sample3 = sample2
   .replace(/(bigInt: )[^,]+?,/, '$1-9223372036854775808n,')
   .replace(/(bigDecimal: )[^,]+?,/, '$13.1415926535897932384626433832795028841971693993751m,')
-  .replace(/(fixedBigDecimal: )[^,]+?,/, '$12.718281828459045235360287471352662d,');
+  .replace(/(decimal: )[^,]+?,/, '$12.718281828459045235360287471352662d,');

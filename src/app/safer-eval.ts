@@ -1,4 +1,4 @@
-import { Decimal as DecimalJS } from 'decimal.js';
+import { Decimal as BigDecimal } from 'decimal.js';
 import { Decimal } from 'proposal-decimal';
 
 // tslint:disable-next-line:variable-name
@@ -11,6 +11,6 @@ export function saferEval(expression: string): any {
   if (!/.*\breturn\b[^'"`}]+$/.test(expression))
     expression = `return (${expression})`;
 
-  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console', 'DecimalJS', 'Decimal',
-    expression)(null, null, null, null, null, null, DecimalJS, Decimal);
+  return new Function('window', 'document', 'location', 'globalThis', 'eval', 'console', 'BigDecimal', 'Decimal',
+    expression)(null, null, null, null, null, null, BigDecimal, Decimal);
 }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Decimal as DecimalJS } from 'decimal.js';
+import { Decimal as BigDecimal } from 'decimal.js';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
 import { MenuItem } from 'primeng/api';
@@ -23,8 +23,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { NgIf } from '@angular/common';
 
-JSONZ.setBigDecimal(DecimalJS);
-JSONZ.setFixedBigDecimal(Decimal);
+JSONZ.setBigDecimal(BigDecimal);
+JSONZ.setDecimal(Decimal);
 
 JSONZ.setOptions(JSONZ.OptionSet.THE_WORKS);
 
@@ -35,7 +35,7 @@ const compatibleOptions: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.OFF,
   primitiveBigDecimal: false,
   primitiveBigInt: false,
-  primitiveFixedBigDecimal: false,
+  primitiveDecimal: false,
   quote: Quote.DOUBLE,
   quoteAllKeys: true,
   revealHiddenArrayProperties: false,
@@ -50,7 +50,7 @@ const relaxedOptions: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.OFF,
   primitiveBigDecimal: false,
   primitiveBigInt: true,
-  primitiveFixedBigDecimal: false,
+  primitiveDecimal: false,
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
@@ -65,7 +65,7 @@ const theWorks: JsonZOptions = {
   extendedTypes: ExtendedTypeMode.AS_FUNCTIONS,
   primitiveBigDecimal: true,
   primitiveBigInt: true,
-  primitiveFixedBigDecimal: true,
+  primitiveDecimal: true,
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
