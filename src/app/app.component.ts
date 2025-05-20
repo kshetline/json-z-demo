@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Decimal as BigDecimal } from 'decimal.js';
@@ -12,16 +12,16 @@ import { Decimal } from 'proposal-decimal';
 import { sample1, sample2, sample3 } from './samples';
 import { isEqual } from '@tubular/util';
 import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { FieldsetModule } from 'primeng/fieldset';
-import { DropdownModule } from 'primeng/dropdown';
 import { DialogModule } from 'primeng/dialog';
 import { MenuModule } from 'primeng/menu';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { NgIf } from '@angular/common';
+import { TextareaModule } from 'primeng/textarea';
+import { TooltipModule } from 'primeng/tooltip';
+import { LabeledCheckboxComponent } from './widgets/labeled-checkbox/labeled-checkbox.component';
+import { SelectModule } from 'primeng/select';
 
 JSONZ.setBigDecimal(BigDecimal);
 JSONZ.setDecimal(Decimal);
@@ -132,8 +132,8 @@ are available for making values compatible with assisted JSONP.`;
   selector: 'jz-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [ButtonModule, CheckboxModule, DialogModule, DropdownModule, FieldsetModule, FormsModule, HttpClientModule,
-    MenuModule, NgIf, ShrinkWrapComponent, InputTextModule, InputTextareaModule],
+  imports: [ButtonModule, DialogModule, FieldsetModule, FormsModule, InputTextModule, LabeledCheckboxComponent,
+            MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule],
   standalone: true
 })
 export class AppComponent implements OnDestroy, OnInit {

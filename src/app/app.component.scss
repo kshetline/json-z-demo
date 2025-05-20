@@ -7,7 +7,9 @@ h3 {
   position: relative;
   height: 1.4em;
 
-  p-dropdown {
+  p-select {
+    font-size: 14px;
+    font-weight: normal;
     position: relative;
     top: -1px;
   }
@@ -40,14 +42,14 @@ h3 {
   justify-content: center;
   margin-top: 1em;
 
-  p-checkbox {
+  jz-checkbox {
     flex: 0 1 0;
     margin: 0 0.5em 1em 0.5em;
     min-width: 225px;
   }
 }
 
-.labeled-dropdown {
+.labeled-select {
   position: relative;
   white-space: nowrap;
 
@@ -70,11 +72,19 @@ h3 {
   min-width: 328px;
   position: relative;
 
-  p-dropdown {
+  p-select {
     margin-right: 0.25em;
 
-    &.input-options ::ng-deep .ui-dropdown {
-      min-width: 11em;
+    &.input-options ::ng-deep .p-select-label {
+      min-width: 9.25em;
+      max-width: 9.25em;
+      overflow: visible;
+    }
+
+    &.reparse-options ::ng-deep .p-select-label{
+      min-width: 10.5em;
+      max-width: 10.5em;
+      overflow: visible;
     }
   }
 }

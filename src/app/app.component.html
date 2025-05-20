@@ -10,36 +10,36 @@
   <div class="details">
     <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
       <div class="boolean-options">
-        <p-checkbox binary="true" label="extendedPrimitives"
-            [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="primitiveBigDecimal"
-            [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="primitiveDecimal"
-            [(ngModel)]="currentOptions.primitiveDecimal" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="primitiveBigInt"
-            [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="quoteAllKeys"
-            [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
-            [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="reviveTypedContainers"
-            [(ngModel)]="reviveTypedContainers" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="sparseArrays"
-            [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></p-checkbox>
-        <p-checkbox binary="true" label="trailingComma"
-            [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></p-checkbox>
+        <jz-checkbox binary="true" label="extendedPrimitives"
+            [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="primitiveBigDecimal"
+            [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="primitiveDecimal"
+            [(ngModel)]="currentOptions.primitiveDecimal" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="primitiveBigInt"
+            [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="quoteAllKeys"
+            [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
+            [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="reviveTypedContainers"
+            [(ngModel)]="reviveTypedContainers" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="sparseArrays"
+            [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></jz-checkbox>
+        <jz-checkbox binary="true" label="trailingComma"
+            [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></jz-checkbox>
       </div>
 
       <div class="other-options">
-        <span class="labeled-dropdown">
+        <span class="labeled-select">
           <label>extendedTypes:</label>
-          <p-dropdown class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes"
-              [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-dropdown>
+          <p-select class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes"
+              [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-select>
         </span>
-        <span class="labeled-dropdown">
+        <span class="labeled-select">
           <label>quote:</label>
-          <p-dropdown class="wider" [options]="quoteOptions" placeholder="quote"
-              [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-dropdown>
+          <p-select class="wider" [options]="quoteOptions" placeholder="quote"
+              [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-select>
         </span>
         <span class="labeled-input">
           <label for="typePrefix">typePrefix:</label>
@@ -73,12 +73,10 @@
 <div class="row panels">
   <div class="col panel">
     <h3>
-      <p-dropdown [options]="inputOptions" placeholder="input options"
-          class="input-options"
-          [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-dropdown>:
+      <p-select [options]="inputOptions" placeholder="input options" class="input-options"
+          [(ngModel)]="inputOption" (onChange)="onInputOptionChange()"></p-select>:
     </h3>
     <div class="icons">
-      <!--suppress AngularUndefinedBinding -->
       <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
           [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
           (touchstart)="touchToHover($event)"></i>
@@ -92,7 +90,7 @@
       <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
       <i class="fas fa-trash" [class.faded]="!source" (click)="clearSource()"></i>
     </div>
-    <textarea pInputTextarea
+    <textarea pTextarea
         title="Source"
         [(ngModel)]="source"
         autocapitalize="off"
@@ -109,24 +107,24 @@
         (onClick)="logSource()"></p-button>
   </div>
 
-  <div *ngIf="showJsonZOutput" class="col panel">
+  @if (showJsonZOutput ) { <div class="col panel">
     <h3 class="json-z-output">JSON-Z output:</h3>
-    <textarea pInputTextarea
+    <textarea pTextarea
         title="Output"
         [ngModel]="output"
         class="code"
         [class.error]="outputError"
         rows="20"
         readonly></textarea>
-  </div>
+  </div> }
 
   <div class="col panel">
     <h3>Reparsed
-      <p-dropdown [options]="reparseOptions" placeholder="reparse options"
-          [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-dropdown>
+      <p-select [options]="reparseOptions" placeholder="reparse options" class="reparse-options"
+          [(ngModel)]="reparseOption" (onChange)="onParsingChange()"></p-select>
       *:
     </h3>
-    <textarea pInputTextarea
+    <textarea pTextarea
         title="Reparsed"
         [ngModel]="reparsed"
         class="code"
