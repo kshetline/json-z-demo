@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Decimal as BigDecimal } from 'decimal.js';
+import JSON5 from 'json5';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
 import { MenuItem } from 'primeng/api';
@@ -9,8 +10,8 @@ import { MenuItem } from 'primeng/api';
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
 import { NO_RESULT, saferEval } from './safer-eval';
 import { Decimal } from 'proposal-decimal';
-import { sample1, sample2, sample3 } from './samples';
-import { isEqual } from '@tubular/util';
+import { sample1, sample2, sample3, sample4 } from './samples';
+import { isEqual, isString } from '@tubular/util';
 import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -108,7 +109,8 @@ function screenTooSmallForTooltip(): boolean {
 enum SampleOptions {
   JAVASCRIPT,
   JSONZ_JSONP,
-  JSONZ
+  JSONZ,
+  JSON5
 }
 
 const inputInfoJavaScript =
@@ -118,7 +120,8 @@ const inputInfoJavaScript =
   <li>JavaScript code ending with <code>return <i>variableName</i></code></li>
   <li>An IIFE returning the desired value.</li>
 </ul>\
-The functions <code>BigInt(<i>string</i>)</code> and <code>BigDecimal(<i>string</i>)</code> \
+The functions <code>BigInt(<i>string</i>)</code>, <code>BigDecimal(<i>string</i>)</code>, \
+and <code>Decimal(<i>string</i>)</code>
 are available for making values compatible with assisted JSONP.`;
 
 const inputInfoJsonz =
@@ -169,11 +172,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
   inputOptions = [
     { label: 'JavaScript or JSON', value: InputOptions.AS_JAVASCRIPT },
+    { label: 'JSON5', value: InputOptions.AS_JSON5 },
     { label: 'JSON-Z', value: InputOptions.AS_JSONZ }
   ];
 
   reparseOptions = [
     { label: 'using JSON', value: ReparseOptions.AS_JSON },
+    { label: 'using JSON5', value: ReparseOptions.AS_JSON5 },
     { label: 'using JSONP', value: ReparseOptions.AS_JSONP },
     { label: 'using assisted JSONP', value: ReparseOptions.AS_JSONP_ASSISTED },
     { label: 'using JSON-Z', value: ReparseOptions.AS_JSONZ }
@@ -181,12 +186,14 @@ export class AppComponent implements OnDestroy, OnInit {
 
   sampleOptions: MenuItem[] = [
     { label: 'JavaScript sample', command: () => this.sampleSelected(SampleOptions.JAVASCRIPT) },
+    { label: 'JSON5 sample', command: () => this.sampleSelected(SampleOptions.JSON5) },
     { label: 'JSON-Z for JSONP sample', command: () => this.sampleSelected(SampleOptions.JSONZ_JSONP) },
     { label: 'JSON-Z sample', command: () => this.sampleSelected(SampleOptions.JSONZ) }
   ];
 
   banner: SafeHtml;
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
+  displayedFormat = 'JSON-Z';
   reviveTypedContainers = true;
   inputInfo = inputInfoJavaScript;
   inputOption = InputOptions.AS_JAVASCRIPT;
@@ -304,6 +311,14 @@ export class AppComponent implements OnDestroy, OnInit {
         this.onInputOptionChange(sample1);
         this.onParsingChange(false);
         this.setCompatible();
+        break;
+
+      case SampleOptions.JSON5:
+        this.inputOption = InputOptions.AS_JSON5;
+        this.reparseOption = ReparseOptions.AS_JSON5;
+        this.onInputOptionChange(sample4);
+        this.onParsingChange(false);
+        this.setTheWorks();
         break;
 
       case SampleOptions.JSONZ_JSONP:
@@ -447,15 +462,34 @@ export class AppComponent implements OnDestroy, OnInit {
         this.reparsedValue = JSON.parse(this.output);
       }
       else if (this.reparseOption === ReparseOptions.AS_JSONZ) {
-        reparsedAs = 'using JSONZ';
+        reparsedAs = 'using JSON-Z';
         this.reparsedValue = JSONZ.parse(this.output, { reviveTypedContainers: this.reviveTypedContainers });
+      }
+      else if (this.reparseOption === ReparseOptions.AS_JSON5) {
+        reparsedAs = 'using JSON5';
+        this.reparsedValue = JSON5.parse(this.output);
       }
       else {
         reparsedAs = 'using JSONP';
         this.reparsedValue = saferEval(this.output);
       }
 
-      this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
+      if (this.reparseOption === ReparseOptions.AS_JSON5) {
+        const q = this.currentOptions.quote;
+        const quote = isString(q) ? q.toString() :
+          (q === Quote.DOUBLE || q === Quote.PREFER_DOUBLE) ? '"' : "'";
+
+        this.reparsed = JSON5.stringify(this.reparsedValue, {
+          space: this.space,
+          quote
+        });
+        this.displayedFormat = 'JSON5';
+      }
+      else {
+        this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
+        this.displayedFormat = 'JSON-Z';
+      }
+
       this.reparsedError = false;
 
       try {
@@ -537,6 +571,10 @@ export class AppComponent implements OnDestroy, OnInit {
       console.error(this.reparsedValue);
     else
       console.log(this.reparsedValue);
+  }
+
+  isJson5(): boolean {
+    return this.reparseOption === ReparseOptions.AS_JSON5;
   }
 
   private updatePrefs(): void {

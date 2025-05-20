@@ -10,30 +10,30 @@
   <div class="details">
     <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
       <div class="boolean-options">
-        <jz-checkbox binary="true" label="extendedPrimitives"
+        <jz-checkbox binary="true" label="extendedPrimitives" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.extendedPrimitives" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="primitiveBigDecimal"
+        <jz-checkbox binary="true" label="primitiveBigDecimal" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.primitiveBigDecimal" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="primitiveDecimal"
+        <jz-checkbox binary="true" label="primitiveDecimal" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.primitiveDecimal" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="primitiveBigInt"
+        <jz-checkbox binary="true" label="primitiveBigInt" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.primitiveBigInt" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="quoteAllKeys"
+        <jz-checkbox binary="true" label="quoteAllKeys" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.quoteAllKeys" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental"
+        <jz-checkbox binary="true" label="revealHiddenArrayProperties" class="experimental" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.revealHiddenArrayProperties" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="reviveTypedContainers"
+        <jz-checkbox binary="true" label="reviveTypedContainers" [disabled]="isJson5()"
             [(ngModel)]="reviveTypedContainers" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="sparseArrays"
+        <jz-checkbox binary="true" label="sparseArrays" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.sparseArrays" (onChange)="onChange()"></jz-checkbox>
-        <jz-checkbox binary="true" label="trailingComma"
+        <jz-checkbox binary="true" label="trailingComma" [disabled]="isJson5()"
             [(ngModel)]="currentOptions.trailingComma" (onChange)="onChange()"></jz-checkbox>
       </div>
 
       <div class="other-options">
         <span class="labeled-select">
-          <label>extendedTypes:</label>
-          <p-select class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes"
+          <label [class.as-disabled]="isJson5()">extendedTypes:</label>
+          <p-select class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes" [disabled]="isJson5()"
               [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-select>
         </span>
         <span class="labeled-select">
@@ -42,8 +42,8 @@
               [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-select>
         </span>
         <span class="labeled-input">
-          <label for="typePrefix">typePrefix:</label>
-          <input id="typePrefix"
+          <label for="typePrefix" [class.as-disabled]="isJson5()">typePrefix:</label>
+          <input id="typePrefix" [disabled]="isJson5()"
               pInputText
               [class.error]="typePrefixError"
               autocapitalize="off"
@@ -131,7 +131,7 @@
         [class.error]="reparsedError"
         rows="20"
         readonly></textarea>
-    <div class="footnote">*After being reparsed, displayed as JSON-Z</div>
+    <div class="footnote">*After being reparsed, displayed as {{displayedFormat}}</div>
     <p-button class="log-button"
         label="Log to web console"
         [disabled]="disableResultLogging()"

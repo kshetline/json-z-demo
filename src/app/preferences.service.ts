@@ -5,14 +5,16 @@ import { clone } from '@tubular/util';
 
 export enum InputOptions {
   AS_JAVASCRIPT,
-  AS_JSONZ
+  AS_JSONZ,
+  AS_JSON5
 }
 
 export enum ReparseOptions {
   AS_JSON,
   AS_JSONP,
   AS_JSONP_ASSISTED,
-  AS_JSONZ
+  AS_JSONZ,
+  AS_JSON5
 }
 
 export interface Preferences {

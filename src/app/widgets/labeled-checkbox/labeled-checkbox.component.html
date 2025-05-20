@@ -1,2 +1,3 @@
-<p-checkbox [inputId]="autoId" [binary]="binary" [(ngModel)]="value" (onChange)="onInputChange($event)"></p-checkbox>
-<label [for]="autoId">{{label}}</label>
+<p-checkbox [inputId]="autoId" [binary]="binary" [(ngModel)]="value" [disabled]="disabled"
+            (onChange)="onInputChange($event)"></p-checkbox>
+<label [for]="autoId" [class.as-disabled]="disabled">{{label}}</label>

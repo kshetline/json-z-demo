@@ -19,6 +19,10 @@ body {
   margin: 1em 0 1em 1em;
 }
 
+.as-disabled {
+  opacity: 0.5;
+}
+
 .header {
   width: calc(100% - 1em);
 }
