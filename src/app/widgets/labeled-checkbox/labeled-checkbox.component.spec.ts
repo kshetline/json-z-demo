@@ -10,7 +10,7 @@ describe('LabeledCheckboxComponent', () => {
     await TestBed.configureTestingModule({
       imports: [LabeledCheckboxComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(LabeledCheckboxComponent);
     component = fixture.componentInstance;

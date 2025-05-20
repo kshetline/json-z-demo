@@ -18,10 +18,10 @@ const NOT_SUPPORTED = / Edge\//.test(navigator.userAgent) ||
                       /(?:\b(MS)?IE\s+|\bTrident\/7\.0;.*\s+rv:)(\d+)/.test(navigator.userAgent);
 
 @Component({
-    selector: 'ks-shrink-wrap',
-    templateUrl: './shrink-wrap.component.html',
-    styleUrls: ['./shrink-wrap.component.scss'],
-    imports: [NgStyle]
+  selector: 'jz-shrink-wrap',
+  templateUrl: './shrink-wrap.component.html',
+  styleUrls: ['./shrink-wrap.component.scss'],
+  imports: [NgStyle]
 })
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private afterInit = false;
@@ -67,6 +67,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       this._minScale = Math.min(Math.max(newValue as number, 0.01), 1);
   }
 
+  // eslint-disable-next-line accessor-pairs
   @Input() set boundingElement(newValue: string | HTMLElement) {
     if (!newValue)
       newValue = docElem;
@@ -86,6 +87,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
     }
   }
 
+  // eslint-disable-next-line accessor-pairs
   @Input() set threshold(newValue: number | string) {
     let changed = false;
 
@@ -152,7 +154,7 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
       scalingWidth = this.thresholdWidth;
 
     // Compensation, if needed, for the 0.05px padding used to prevent margin collapse.
-    const sizerAdjust = (sizerWidth < scalingWidth)  ? 0.1 : 0;
+    const sizerAdjust = (sizerWidth < scalingWidth) ? 0.1 : 0;
 
     this.scale = Math.min(Math.max((sizerWidth - sizerAdjust) / scalingWidth, this.minScale as number), 1);
 
@@ -182,8 +184,6 @@ export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
 
     this.scaleChange.emit(this.scale);
   }
-
-  constructor() { }
 
   ngOnInit(): void {
     this.inner = this.innerRef.nativeElement;

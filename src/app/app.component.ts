@@ -80,7 +80,7 @@ let prefixRegex = /^(_|(_[_$a-z0-9]*_))$/i;
 
 try {
   // Use smarter recognition of identifier characters, if available.
-  const regex = new RegExp('^(_|(_[_$\\p{L}\\p{Nd}\\p{Mn}\\p{Mc}\\p{Pc}]*_))$', 'iu');
+  const regex = /^(_|(_[_$\p{L}\p{Nd}\p{Mn}\p{Mc}\p{Pc}]*_))$/iu;
 
   if (regex.test('_å_'))
     prefixRegex = regex;
@@ -91,7 +91,7 @@ let spaceRegex = /^[\t\n\v\f\r \xA0\u2028\u2029\uFEFF]{0,10}$/;
 
 try {
   // Use smarter recognition of identifier characters, if available.
-  const regex = new RegExp('^[\\t\\n\\v\\f\\r \\xA0\\u2028\\u2029\\uFEFF\\p{Zs}]{0,10}$', 'u');
+  const regex = /^[\t\n\v\f\r \xA0\u2028\u2029\uFEFF\p{Zs}]{0,10}$/u;
 
   if (regex.test('\u2029'))
     spaceRegex = regex;
@@ -132,11 +132,11 @@ The functions <code>_BigInt(<i>string</i>)</code> and <code>_BigDecimal(<i>strin
 are available for making values compatible with assisted JSONP.`;
 
 @Component({
-    selector: 'jz-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    imports: [ButtonModule, DialogModule, FieldsetModule, FormsModule, InputTextModule, LabeledCheckboxComponent,
-        MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule]
+  selector: 'jz-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  imports: [ButtonModule, DialogModule, FieldsetModule, FormsModule, InputTextModule, LabeledCheckboxComponent,
+            MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule]
 })
 export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
@@ -150,7 +150,7 @@ export class AppComponent implements OnDestroy, OnInit {
   private _typePrefix = '_';
   private needsMouseLeave: HTMLElement;
 
-  private clickListener = () => {
+  private clickListener = (): void => {
     if (this.needsMouseLeave) {
       this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
       this.needsMouseLeave = undefined;
@@ -185,10 +185,10 @@ export class AppComponent implements OnDestroy, OnInit {
   ];
 
   sampleOptions: MenuItem[] = [
-    { label: 'JavaScript sample', command: () => this.sampleSelected(SampleOptions.JAVASCRIPT) },
-    { label: 'JSON5 sample', command: () => this.sampleSelected(SampleOptions.JSON5) },
-    { label: 'JSON-Z for JSONP sample', command: () => this.sampleSelected(SampleOptions.JSONZ_JSONP) },
-    { label: 'JSON-Z sample', command: () => this.sampleSelected(SampleOptions.JSONZ) }
+    { label: 'JavaScript sample', command: (): void => this.sampleSelected(SampleOptions.JAVASCRIPT) },
+    { label: 'JSON5 sample', command: (): void => this.sampleSelected(SampleOptions.JSON5) },
+    { label: 'JSON-Z for JSONP sample', command: (): void => this.sampleSelected(SampleOptions.JSONZ_JSONP) },
+    { label: 'JSON-Z sample', command: (): void => this.sampleSelected(SampleOptions.JSONZ) }
   ];
 
   banner: SafeHtml;
@@ -263,7 +263,7 @@ export class AppComponent implements OnDestroy, OnInit {
   constructor(
     http: HttpClient,
     private prefsService: PreferencesService,
-    sanitizer: DomSanitizer,
+    sanitizer: DomSanitizer
   ) {
     http.get('assets/banner.html', { responseType: 'text' })
       .subscribe(content => this.banner = sanitizer.bypassSecurityTrustHtml(content.toString()));

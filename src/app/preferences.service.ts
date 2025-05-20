@@ -58,7 +58,7 @@ export class PreferencesService {
     if (!this.settingsTimer) {
       this.settingsTimer = setTimeout(() => {
         this.settingsTimer = undefined;
-        localStorage.setItem('jsonz-prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS))
+        localStorage.setItem('jsonz-prefs', JSONZ.stringify(this.prefs, JSONZ.OptionSet.THE_WORKS));
       }, 2000);
     }
   }

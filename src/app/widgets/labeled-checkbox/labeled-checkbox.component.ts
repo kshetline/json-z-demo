@@ -5,15 +5,15 @@ import { Checkbox, CheckboxChangeEvent } from 'primeng/checkbox';
 let jzCheckboxAutoId = 0;
 
 @Component({
-    selector: 'jz-checkbox',
-    imports: [Checkbox, FormsModule],
-    templateUrl: './labeled-checkbox.component.html',
-    styleUrl: './labeled-checkbox.component.scss',
-    providers: [{
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => LabeledCheckboxComponent),
-            multi: true
-        }]
+  selector: 'jz-checkbox',
+  imports: [Checkbox, FormsModule],
+  templateUrl: './labeled-checkbox.component.html',
+  styleUrl: './labeled-checkbox.component.scss',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => LabeledCheckboxComponent),
+    multi: true
+  }]
 })
 export class LabeledCheckboxComponent implements ControlValueAccessor {
   autoId = `jz-checkbox-${jzCheckboxAutoId++}`;
@@ -25,6 +25,7 @@ export class LabeledCheckboxComponent implements ControlValueAccessor {
   @Input() label: string;
   @Input() disabled: boolean;
 
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() onChange = new EventEmitter<CheckboxChangeEvent>();
 
   writeValue(value: boolean): void {
@@ -43,7 +44,7 @@ export class LabeledCheckboxComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onInputChange(value: CheckboxChangeEvent) {
+  onInputChange(value: CheckboxChangeEvent): void {
     this.value = value.checked;
     this.ngOnChange(this.value);
     this.onChange.emit(value);
