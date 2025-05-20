@@ -3,8 +3,14 @@
   src: url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 }
 
+$tooltip-background: #9CF;
+$tooltip-text-color: black;
+
 :root {
   --font-family: "Open Sans", OpenSans2, "Helvetica Neue";
+  --p-tooltip-background: #9CF !important; // Not sure why the variable $tooltip-background doesn't work here.
+  --p-tooltip-color: black !important;
+  --p-tooltip-max-width: 420px !important;
 }
 
 html {
@@ -121,37 +127,27 @@ p-button button {
   min-width: 12.5em;
 }
 
-$tooltip-background: #7AF;
-$tooltip-text-color: black;
+.tooltip-dialog.p-dialog {
+  background-color: $tooltip-background;
+  color: $tooltip-text-color;
+  max-width: 98vw;
+  white-space: pre-line;
 
-.tooltip.ui-tooltip {
-  max-width: 420px;
+  .p-dialog-header {
+    position: absolute;
+    right: -0.75em;
+    top: -0.75em;
 
-  .ui-tooltip-arrow {
-    border-bottom-color: $tooltip-background !important;
+    .p-button {
+      background-color: transparent !important;
+      border: none !important;
+      color: black !important;
+      outline: none !important;
+    }
   }
 
-  .ui-tooltip-text {
-    background-color: $tooltip-background;
-    color: $tooltip-text-color;
-  }
-}
-
-.tooltip-dialog.ui-dialog {
-  .ui-dialog-content, .ui-dialog-titlebar {
-    background-color: $tooltip-background;
-    border-color: #46F;
-    color: $tooltip-text-color;
-    max-width: 98vh;
-  }
-
-  .ui-dialog-content {
-    border-top: none;
-  }
-
-  .ui-dialog-titlebar {
-    font-size: 2em;
-    padding: 0.25em;
+  .p-dialog-content {
+    margin: 2em;
   }
 }
 
