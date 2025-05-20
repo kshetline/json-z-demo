@@ -28,11 +28,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: AuraSky,
-        options: {
-          // I'd like something simple here, like:
-          // palette: "sky"
-        }
+        preset: AuraSky
       }
     }),
     provideHttpClient()
