@@ -18,11 +18,10 @@ const NOT_SUPPORTED = / Edge\//.test(navigator.userAgent) ||
                       /(?:\b(MS)?IE\s+|\bTrident\/7\.0;.*\s+rv:)(\d+)/.test(navigator.userAgent);
 
 @Component({
-  selector: 'ks-shrink-wrap',
-  templateUrl: './shrink-wrap.component.html',
-  styleUrls: ['./shrink-wrap.component.scss'],
-  imports: [NgStyle],
-  standalone: true
+    selector: 'ks-shrink-wrap',
+    templateUrl: './shrink-wrap.component.html',
+    styleUrls: ['./shrink-wrap.component.scss'],
+    imports: [NgStyle]
 })
 export class ShrinkWrapComponent implements AfterViewInit, OnDestroy, OnInit {
   private afterInit = false;

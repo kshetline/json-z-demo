@@ -129,12 +129,11 @@ The functions <code>_BigInt(<i>string</i>)</code> and <code>_BigDecimal(<i>strin
 are available for making values compatible with assisted JSONP.`;
 
 @Component({
-  selector: 'jz-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  imports: [ButtonModule, DialogModule, FieldsetModule, FormsModule, InputTextModule, LabeledCheckboxComponent,
-            MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule],
-  standalone: true
+    selector: 'jz-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    imports: [ButtonModule, DialogModule, FieldsetModule, FormsModule, InputTextModule, LabeledCheckboxComponent,
+        MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule]
 })
 export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;

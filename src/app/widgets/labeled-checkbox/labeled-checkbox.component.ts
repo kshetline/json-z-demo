@@ -5,16 +5,15 @@ import { Checkbox, CheckboxChangeEvent } from 'primeng/checkbox';
 let jzCheckboxAutoId = 0;
 
 @Component({
-  selector: 'jz-checkbox',
-  standalone: true,
-  imports: [Checkbox, FormsModule],
-  templateUrl: './labeled-checkbox.component.html',
-  styleUrl: './labeled-checkbox.component.scss',
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => LabeledCheckboxComponent),
-    multi: true
-  }]
+    selector: 'jz-checkbox',
+    imports: [Checkbox, FormsModule],
+    templateUrl: './labeled-checkbox.component.html',
+    styleUrl: './labeled-checkbox.component.scss',
+    providers: [{
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => LabeledCheckboxComponent),
+            multi: true
+        }]
 })
 export class LabeledCheckboxComponent implements ControlValueAccessor {
   autoId = `jz-checkbox-${jzCheckboxAutoId++}`;
