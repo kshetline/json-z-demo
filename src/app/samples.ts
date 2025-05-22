@@ -54,9 +54,9 @@ No \\\\n's!",
 }`;
 
 export const sample3 = sample2
-  .replace(/(bigInt: )[^,]+?,/, '$1-9223372036854775808n,')
-  .replace(/(bigDecimal: )[^,]+?,/, '$13.1415926535897932384626433832795028841971693993751m,')
-  .replace(/(decimal: )[^,]+?,/, '$12.718281828459045235360287471352662d,');
+  .replace(/(\bbigInt: )[^,]+?,/, '$1-9223372036854775808n,')
+  .replace(/(\bbigDecimal: )[^,]+?,/, '$13.1415926535897932384626433832795028841971693993751m,')
+  .replace(/(\bdecimal: )[^,]+?,/, '$12.718281828459045235360287471352662d,');
 
 // noinspection SpellCheckingInspection
 export const sample4 =

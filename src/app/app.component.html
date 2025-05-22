@@ -107,7 +107,7 @@
         (onClick)="logSource()"></p-button>
   </div>
 
-  @if (showJsonZOutput ) { <div class="col panel">
+  @if (showJsonZOutput) { <div class="col panel">
     <h3 class="json-z-output">JSON-Z output:</h3>
     <textarea pTextarea
         title="Output"
@@ -136,5 +136,20 @@
         label="Log to web console"
         [disabled]="disableResultLogging()"
         (onClick)="logResult()"></p-button>
+    <h3>
+      <jz-checkbox binary="true" label="Replacer function:"
+          [(ngModel)]="useReplacer" (onChange)="onChange(true)"></jz-checkbox>
+    </h3>
+    <textarea pTextarea
+        title="Replacer"
+        [(ngModel)]="replacer"
+        [disabled]="!useReplacer"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="code"
+        rows="10"
+        spellcheck="false"
+        (input)="onChange(true)"></textarea>
   </div>
 </div>

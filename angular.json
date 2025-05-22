@@ -34,7 +34,11 @@
               "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "json5",
+              "json-z"
+            ],
           },
           "configurations": {
             "production": {

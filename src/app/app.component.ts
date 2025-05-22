@@ -144,7 +144,10 @@ export class AppComponent implements OnDestroy, OnInit {
   private lastReparseErrorTimer: any;
   private newErrorTime = 0;
   private newReparseErrorTime = 0;
+  private pendingOutput: string;
+  private pendingSourceValue: any;
   private reparsedValue: any;
+  private replacerFn: any;
   private sourceValue: any;
   private _space: string | number = 2;
   private _typePrefix = '_';
@@ -199,6 +202,7 @@ export class AppComponent implements OnDestroy, OnInit {
   inputOption = InputOptions.AS_JAVASCRIPT;
   output = '';
   outputError = false;
+  replacer = '';
   reparsed = '';
   reparsedAsJSON = '';
   reparsedError = false;
@@ -208,6 +212,7 @@ export class AppComponent implements OnDestroy, OnInit {
   source = '';
   spaceError = false;
   typePrefixError = false;
+  useReplacer = false;
 
   get detailsCollapsed(): boolean { return this._detailsCollapsed; }
   set detailsCollapsed(newValue: boolean) {
@@ -405,35 +410,76 @@ export class AppComponent implements OnDestroy, OnInit {
       }
     }
 
-    if (this.showJsonZOutput) {
-      try {
-        this.sourceValue = saferEval(this.source);
-        this.output = this.sourceValue === NO_RESULT ? '' : JSONZ.stringify(this.sourceValue, this.currentOptions, this.space);
-        this.outputError = false;
+    this.pendingOutput = ''
+    this.pendingSourceValue = undefined;
+    this.currentOptions.replacer = undefined;
+
+    const err = this.validateReplacer() || this.validateInput();
+
+    if (!err) {
+      this.output = this.pendingOutput;
+      this.sourceValue = this.pendingSourceValue;
+      this.reparse(delayError);
+    }
+    else {
+      if (!this.newErrorTime)
+        this.newErrorTime = performance.now();
+
+      this.lastErrorTimer = setTimeout(() => {
+        this.lastErrorTimer = undefined;
         this.newErrorTime = 0;
-        this.reparse(delayError);
+        this.output = err.toLocaleString();
+        this.outputError = true;
+        this.sourceValue = err;
+        this.reparsed = '';
+      }, delayError ? ERROR_DELAY : 0);
+    }
+  }
+
+  private validateReplacer(): any {
+    if (this.useReplacer && this.replacer.trim()) {
+      try {
+        this.replacerFn = saferEval(this.replacer);
+
+        if (this.replacerFn && (typeof this.replacerFn !== 'function' || this.replacerFn.length < 2))
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error('The specified replacer is not a function with at least two arguments.');
       }
       catch (err) {
-        if (!this.newErrorTime)
-          this.newErrorTime = performance.now();
+        this.replacerFn = undefined;
 
-        this.lastErrorTimer = setTimeout(() => {
-          this.lastErrorTimer = undefined;
-          this.newErrorTime = 0;
-          this.output = err.toLocaleString();
-          this.outputError = true;
-          this.sourceValue = err;
-          this.reparsed = '';
-        }, delayError ? ERROR_DELAY : 0);
+        return err;
+      }
+    }
+    else
+      this.replacerFn = undefined;
+
+    return null;
+  }
+
+  private validateInput(): any {
+    if (this.showJsonZOutput) {
+      try {
+        this.pendingSourceValue = saferEval(this.source);
+        this.pendingOutput = this.pendingSourceValue === NO_RESULT ? '' :
+          JSONZ.stringify(this.pendingSourceValue, this.currentOptions, this.space);
+        this.outputError = false;
+        this.newErrorTime = 0;
+
+        return null;
+      }
+      catch (err) {
+        return err;
       }
     }
     else {
-      this.sourceValue = (!this.source || this.source.trim() === '' ? NO_RESULT : this.source);
-      this.output = this.source;
+      this.pendingSourceValue = (!this.source || this.source.trim() === '' ? NO_RESULT : this.source);
+      this.pendingOutput = this.source;
       this.outputError = false;
       this.newErrorTime = 0;
-      this.reparse(delayError);
     }
+
+    return null;
   }
 
   private reparse(delayError = false): void {
@@ -481,11 +527,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
         this.reparsed = JSON5.stringify(this.reparsedValue, {
           space: this.space,
-          quote
+          quote,
+          replacer: this.replacerFn
         });
         this.displayedFormat = 'JSON5';
       }
       else {
+        this.currentOptions.replacer = this.replacerFn;
         this.reparsed = JSONZ.stringify(this.reparsedValue, this.currentOptions, this.space);
         this.displayedFormat = 'JSON-Z';
       }
