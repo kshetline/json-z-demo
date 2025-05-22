@@ -148,6 +148,7 @@ export class AppComponent implements OnDestroy, OnInit {
   private pendingSourceValue: any;
   private reparsedValue: any;
   private replacerFn: any;
+  private reviverFn: any;
   private sourceValue: any;
   private _space: string | number = 2;
   private _typePrefix = '_';
@@ -207,12 +208,14 @@ export class AppComponent implements OnDestroy, OnInit {
   reparsedAsJSON = '';
   reparsedError = false;
   reparseOption = ReparseOptions.AS_JSON;
+  reviver = '';
   showInputInfo = false;
   showJsonZOutput = true;
   source = '';
   spaceError = false;
   typePrefixError = false;
   useReplacer = false;
+  useReviver = false;
 
   get detailsCollapsed(): boolean { return this._detailsCollapsed; }
   set detailsCollapsed(newValue: boolean) {
@@ -282,6 +285,10 @@ export class AppComponent implements OnDestroy, OnInit {
       this.inputInfo = (this.inputOption === InputOptions.AS_JAVASCRIPT ? inputInfoJavaScript : inputInfoJsonz);
       this.currentOptions = prefs.options || this.currentOptions;
       this.reparseOption = prefs.reparseOption ?? ReparseOptions.AS_JSON;
+      this.replacer = prefs.replacer ?? '';
+      this.useReplacer = !!prefs.replacerOn;
+      this.reviver = prefs.reviver ?? '';
+      this.useReviver = !!prefs.reviverOn;
       this.reviveTypedContainers = prefs.reviveTypedContainers ?? this.reviveTypedContainers;
       this.source = prefs.source || '';
       this.space = prefs.space || 0;
@@ -414,7 +421,9 @@ export class AppComponent implements OnDestroy, OnInit {
     this.pendingSourceValue = undefined;
     this.currentOptions.replacer = undefined;
 
-    const err = this.validateReplacer() || this.validateInput();
+    const err = this.validateReplacer() ||
+                this.validateReviver() || this.reviverErr ||
+                this.validateInput();
 
     if (!err) {
       this.output = this.pendingOutput;
@@ -453,6 +462,32 @@ export class AppComponent implements OnDestroy, OnInit {
     }
     else
       this.replacerFn = undefined;
+
+    return null;
+  }
+
+  private reviverErr: any;
+
+  private validateReviver(): any {
+    this.reviverErr = undefined;
+
+    if (this.useReviver && this.reviver.trim() && !this.isJsonP()) {
+      try {
+        this.reviverFn = saferEval(this.reviver);
+
+        if (this.reviverFn && (typeof this.reviverFn !== 'function' || this.reviverFn.length < 2))
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error('The specified reviver is not a function with at least two arguments.');
+      }
+      catch (err) {
+        this.reviverErr = err;
+        this.reviverFn = undefined;
+
+        return err;
+      }
+    }
+    else
+      this.reviverFn = undefined;
 
     return null;
   }
@@ -505,15 +540,18 @@ export class AppComponent implements OnDestroy, OnInit {
     try {
       if (this.reparseOption === ReparseOptions.AS_JSON) {
         reparsedAs = 'as standard JSON';
-        this.reparsedValue = JSON.parse(this.output);
+        this.reparsedValue = JSON.parse(this.output, this.reviverFn);
       }
       else if (this.reparseOption === ReparseOptions.AS_JSONZ) {
         reparsedAs = 'using JSON-Z';
-        this.reparsedValue = JSONZ.parse(this.output, { reviveTypedContainers: this.reviveTypedContainers });
+        this.reparsedValue = JSONZ.parse(this.output, {
+          reviver: this.reviverFn,
+          reviveTypedContainers: this.reviveTypedContainers
+        });
       }
       else if (this.reparseOption === ReparseOptions.AS_JSON5) {
         reparsedAs = 'using JSON5';
-        this.reparsedValue = JSON5.parse(this.output);
+        this.reparsedValue = JSON5.parse(this.output, this.reviverFn);
       }
       else {
         reparsedAs = 'using JSONP';
@@ -625,11 +663,19 @@ export class AppComponent implements OnDestroy, OnInit {
     return this.reparseOption === ReparseOptions.AS_JSON5;
   }
 
+  isJsonP(): boolean {
+    return this.reparseOption === ReparseOptions.AS_JSONP || this.reparseOption === ReparseOptions.AS_JSONP_ASSISTED;
+  }
+
   private updatePrefs(): void {
     const prefs = {
       detailsCollapsed: this.detailsCollapsed,
       inputOption: this.inputOption,
       options: this.currentOptions,
+      replacer: this.replacer,
+      replacerOn: this.useReplacer,
+      reviver: this.reviver,
+      reviverOn: this.useReviver,
       reviveTypedContainers: this.reviveTypedContainers,
       reparseOption: this.reparseOption,
       source: this.source,

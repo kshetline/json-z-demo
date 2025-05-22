@@ -21,7 +21,11 @@ export interface Preferences {
   detailsCollapsed?: boolean;
   inputOption?: InputOptions;
   options?: JsonZOptions;
+  replacer?: string;
+  replacerOn?: boolean;
   reparseOption?: ReparseOptions;
+  reviver?: string;
+  reviverOn?: boolean;
   reviveTypedContainers?: boolean;
   source?: string;
   space?: string | number;

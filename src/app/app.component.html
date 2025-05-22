@@ -105,6 +105,21 @@
         label="Log to web console"
         [disabled]="disableSourceLogging()"
         (onClick)="logSource()"></p-button>
+    <h3>
+      <jz-checkbox binary="true" label="Replacer function:"
+          [(ngModel)]="useReplacer" (onChange)="onChange(true)"></jz-checkbox>
+    </h3>
+    <textarea pTextarea
+        title="Replacer"
+        [(ngModel)]="replacer"
+        [disabled]="!useReplacer"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="code"
+        rows="10"
+        spellcheck="false"
+        (input)="onChange(true)"></textarea>
   </div>
 
   @if (showJsonZOutput) { <div class="col panel">
@@ -137,13 +152,13 @@
         [disabled]="disableResultLogging()"
         (onClick)="logResult()"></p-button>
     <h3>
-      <jz-checkbox binary="true" label="Replacer function:"
-          [(ngModel)]="useReplacer" (onChange)="onChange(true)"></jz-checkbox>
+      <jz-checkbox binary="true" label="Reviver function:" [disabled]="isJsonP()"
+          [(ngModel)]="useReviver" (onChange)="onChange(true)"></jz-checkbox>
     </h3>
     <textarea pTextarea
         title="Replacer"
-        [(ngModel)]="replacer"
-        [disabled]="!useReplacer"
+        [(ngModel)]="reviver"
+        [disabled]="!useReviver || isJsonP()"
         autocapitalize="off"
         autocomplete="off"
         autocorrect="off"
