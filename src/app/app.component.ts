@@ -76,6 +76,8 @@ const theWorks: JsonZOptions = {
   typePrefix: '_',
 };
 
+const allPurposeCallback = '(key, value) => value';
+
 let prefixRegex = /^(_|(_[_$a-z0-9]*_))$/i;
 
 try {
@@ -130,6 +132,12 @@ not just the features selected for stringification above.
 
 The functions <code>_BigInt(<i>string</i>)</code> and <code>_BigDecimal(<i>string</i>)</code> \
 are available for making values compatible with assisted JSONP.`;
+
+const replacerInfo =
+`Enter a JavaScript code below for a replacer function.`;
+
+const reviverInfo =
+`Enter a JavaScript code below for a reviver function.`;
 
 @Component({
   selector: 'jz-root',
@@ -203,14 +211,18 @@ export class AppComponent implements OnDestroy, OnInit {
   inputOption = InputOptions.AS_JAVASCRIPT;
   output = '';
   outputError = false;
-  replacer = '';
+  replacer = allPurposeCallback;
+  replacerInfo = replacerInfo;
   reparsed = '';
   reparsedAsJSON = '';
   reparsedError = false;
   reparseOption = ReparseOptions.AS_JSON;
-  reviver = '';
+  reviver = allPurposeCallback;
+  reviverInfo = reviverInfo;
   showInputInfo = false;
   showJsonZOutput = true;
+  showReplacerInfo = false;
+  showReviverInfo = false;
   source = '';
   spaceError = false;
   typePrefixError = false;
@@ -351,11 +363,15 @@ export class AppComponent implements OnDestroy, OnInit {
     }
   }
 
-  touchToHover(event: TouchEvent): void {
+  touchInput = () => this.showInputInfo = true;
+  touchReplacer = () => this.showReplacerInfo = true;
+  touchReviver = () => this.showReviverInfo = true;
+
+  touchToHover(event: TouchEvent, callback: () => any): void {
     event.preventDefault();
 
     if (screenTooSmallForTooltip())
-      this.showInputInfo = true;
+      callback();
     else if (this.needsMouseLeave) {
       this.needsMouseLeave.dispatchEvent(new MouseEvent('mouseleave'));
       this.needsMouseLeave = undefined;
@@ -398,6 +414,16 @@ export class AppComponent implements OnDestroy, OnInit {
     this.onChange(false, updateThePrefs);
   }
 
+  clearReplacer(): void {
+    this.replacer = allPurposeCallback;
+    this.onChange();
+  }
+
+  clearReviver(): void {
+    this.replacer = allPurposeCallback;
+    this.onChange();
+  }
+
   clearSource(): void {
     this.source = '';
     this.onChange();
@@ -421,9 +447,7 @@ export class AppComponent implements OnDestroy, OnInit {
     this.pendingSourceValue = undefined;
     this.currentOptions.replacer = undefined;
 
-    const err = this.validateReplacer() ||
-                this.validateReviver() || this.reviverErr ||
-                this.validateInput();
+    const err = this.validateReplacer() || this.validateReviver() || this.validateInput();
 
     if (!err) {
       this.output = this.pendingOutput;
@@ -437,59 +461,61 @@ export class AppComponent implements OnDestroy, OnInit {
       this.lastErrorTimer = setTimeout(() => {
         this.lastErrorTimer = undefined;
         this.newErrorTime = 0;
-        this.output = err.toLocaleString();
-        this.outputError = true;
         this.sourceValue = err;
-        this.reparsed = '';
+
+        if (this.showJsonZOutput) {
+          this.output = err.toLocaleString();
+          this.outputError = true;
+          this.reparsed = '';
+        }
+        else {
+          this.reparsed = err.toLocaleString();
+          this.reparsedError = true;
+        }
       }, delayError ? ERROR_DELAY : 0);
     }
   }
 
   private validateReplacer(): any {
+    let error: any;
+
     if (this.useReplacer && this.replacer.trim()) {
       try {
         this.replacerFn = saferEval(this.replacer);
 
         if (this.replacerFn && (typeof this.replacerFn !== 'function' || this.replacerFn.length < 2))
-          // noinspection ExceptionCaughtLocallyJS
-          throw new Error('The specified replacer is not a function with at least two arguments.');
+          error = Error('The specified replacer is not a function with at least two arguments.');
       }
       catch (err) {
         this.replacerFn = undefined;
-
-        return err;
+        error = err;
       }
     }
     else
       this.replacerFn = undefined;
 
-    return null;
+    return error;
   }
 
-  private reviverErr: any;
-
   private validateReviver(): any {
-    this.reviverErr = undefined;
+    let error: any;
 
     if (this.useReviver && this.reviver.trim() && !this.isJsonP()) {
       try {
         this.reviverFn = saferEval(this.reviver);
 
         if (this.reviverFn && (typeof this.reviverFn !== 'function' || this.reviverFn.length < 2))
-          // noinspection ExceptionCaughtLocallyJS
-          throw new Error('The specified reviver is not a function with at least two arguments.');
+          error = new Error('The specified reviver is not a function with at least two arguments.');
       }
       catch (err) {
-        this.reviverErr = err;
         this.reviverFn = undefined;
-
-        return err;
+        error = err;
       }
     }
     else
       this.reviverFn = undefined;
 
-    return null;
+    return error;
   }
 
   private validateInput(): any {

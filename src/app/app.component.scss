@@ -89,6 +89,14 @@ h3 {
   }
 }
 
+.icons-offsetter {
+  height: 0;
+  overflow: visible;
+  position: relative;
+  top: -4em;
+  width: 100%
+}
+
 .icons {
   color: #666;
   font-size: 1.5em;

@@ -79,7 +79,7 @@
     <div class="icons">
       <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
           [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
-          (touchstart)="touchToHover($event)"></i>
+          (touchstart)="touchToHover($event, touchInput)"></i>
       <p-dialog [(visible)]="showInputInfo" [blockScroll]="true"
           [resizable]="false" appendTo="body" styleClass="tooltip-dialog"
           [showHeader]="true" [modal]="true" [dismissableMask]="true">
@@ -109,6 +109,20 @@
       <jz-checkbox binary="true" label="Replacer function:"
           [(ngModel)]="useReplacer" (onChange)="onChange(true)"></jz-checkbox>
     </h3>
+    <div class="icons-offsetter"><div class="icons">
+      <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
+          [pTooltip]="replacerInfo" [escape]="false" tooltipStyleClass="tooltip"
+          (touchstart)="touchToHover($event, touchReplacer)"></i>
+      <p-dialog [(visible)]="showReplacerInfo" [blockScroll]="true"
+          [resizable]="false" appendTo="body" styleClass="tooltip-dialog"
+          [showHeader]="true" [modal]="true" [dismissableMask]="true">
+        <div [innerHTML]="replacerInfo"></div>
+      </p-dialog>
+      <p-menu #samples [popup]="true" [model]="[]" appendTo="body"
+          (onHide)="sampleSelected($event)"></p-menu>
+      <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
+      <i class="fas fa-trash" [class.faded]="!source" (click)="clearReplacer()"></i>
+    </div></div>
     <textarea pTextarea
         title="Replacer"
         [(ngModel)]="replacer"
@@ -155,6 +169,20 @@
       <jz-checkbox binary="true" label="Reviver function:" [disabled]="isJsonP()"
           [(ngModel)]="useReviver" (onChange)="onChange(true)"></jz-checkbox>
     </h3>
+    <div class="icons-offsetter"><div class="icons">
+      <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
+          [pTooltip]="reviverInfo" [escape]="false" tooltipStyleClass="tooltip"
+          (touchstart)="touchToHover($event, touchReviver)"></i>
+      <p-dialog [(visible)]="showReviverInfo" [blockScroll]="true"
+          [resizable]="false" appendTo="body" styleClass="tooltip-dialog"
+          [showHeader]="true" [modal]="true" [dismissableMask]="true">
+        <div [innerHTML]="reviverInfo"></div>
+      </p-dialog>
+      <p-menu #samples [popup]="true" [model]="[]" appendTo="body"
+          (onHide)="sampleSelected($event)"></p-menu>
+      <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
+      <i class="fas fa-trash" [class.faded]="!source" (click)="clearReviver()"></i>
+    </div></div>
     <textarea pTextarea
         title="Replacer"
         [(ngModel)]="reviver"
