@@ -31,7 +31,7 @@ export const sample2 =
 No \\\\n's!",
   // Underscore separators in numbers allowed
   million: 1_000_000,
-  hexadecimal: 0xdecaf,
+  hexadecimal: /* block comments */ 0xdecaf,
   // Leading 0 indicates octal if no non-octal digits (8, 9) follow
   octal: [0o7, 074],
   binary: 0b100101,
@@ -101,6 +101,6 @@ function hex(key, value) {
     const sign = value < 0 ? (value = -value) && '-' : '';
     return JSONZ.LITERALLY_AS(sign + '0x' + value.toString(16).toUpperCase() + 'n');
   }
-  
+
   return value;
-}`
+}`;
