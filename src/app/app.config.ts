@@ -2,9 +2,8 @@ import { ApplicationConfig } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
-import {palette} from '@primeng/themes';
+import { palette, definePreset } from '@primeng/themes';
 import { provideHttpClient } from '@angular/common/http';
-import { definePreset } from '@primeng/themes';
 
 const AuraSky = definePreset(Aura, {
   semantic: {

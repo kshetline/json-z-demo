@@ -154,7 +154,7 @@ const reviverInfo =
             MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule]
 })
 export class AppComponent implements OnDestroy, OnInit {
-  readonly allPurposeCallback = allPurposeCallback
+  readonly allPurposeCallback = allPurposeCallback;
 
   private _detailsCollapsed = false;
   private lastErrorTimer: any;
@@ -223,7 +223,7 @@ export class AppComponent implements OnDestroy, OnInit {
     { label: 'Strings to uppercase', command: (): void => this.sampleSelected(SampleOptions.UPPERCASE, true) },
     { label: 'Disable implied octal', command: (): void => this.sampleSelected(SampleOptions.NO_OCTAL, true) },
     { label: 'Deleting values', command: (): void => this.sampleSelected(SampleOptions.DELETING, true) }
-];
+  ];
 
   banner: SafeHtml;
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
@@ -418,9 +418,9 @@ export class AppComponent implements OnDestroy, OnInit {
     }
   }
 
-  touchInput = () => this.showInputInfo = true;
-  touchReplacer = () => this.showReplacerInfo = true;
-  touchReviver = () => this.showReviverInfo = true;
+  touchInput = (): any => this.showInputInfo = true;
+  touchReplacer = (): any => this.showReplacerInfo = true;
+  touchReviver = (): any => this.showReviverInfo = true;
 
   touchToHover(event: TouchEvent, callback: () => any): void {
     event.preventDefault();
@@ -498,7 +498,7 @@ export class AppComponent implements OnDestroy, OnInit {
       }
     }
 
-    this.pendingOutput = ''
+    this.pendingOutput = '';
     this.pendingSourceValue = undefined;
     this.currentOptions.replacer = undefined;
 
