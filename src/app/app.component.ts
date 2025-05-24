@@ -6,11 +6,13 @@ import JSON5 from 'json5';
 import * as JSONZ from 'json-z';
 import { ExtendedTypeMode, JsonZOptions, Quote } from 'json-z';
 import { MenuItem } from 'primeng/api';
-
 import { InputOptions, PreferencesService, ReparseOptions } from './preferences.service';
 import { NO_RESULT, saferEval } from './safer-eval';
 import { Decimal } from 'proposal-decimal';
-import { sample1, sample2, sample3, sample4 } from './samples';
+import {
+  replacerSample2, replacerSample4, reviverSample2, sample1, sample2, sample3, sample4,
+  sharedSample1, sharedSample3
+} from './samples';
 import { isEqual, isString } from '@tubular/util';
 import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
 import { ButtonModule } from 'primeng/button';
@@ -112,7 +114,12 @@ enum SampleOptions {
   JAVASCRIPT,
   JSONZ_JSONP,
   JSONZ,
-  JSON5
+  JSON5,
+  UPPERCASE,
+  ROUNDING,
+  DELETING,
+  HEXADECIMAL,
+  NO_OCTAL
 }
 
 const inputInfoJavaScript =
@@ -147,6 +154,8 @@ const reviverInfo =
             MenuModule, SelectModule, ShrinkWrapComponent, TextareaModule, TooltipModule]
 })
 export class AppComponent implements OnDestroy, OnInit {
+  readonly allPurposeCallback = allPurposeCallback
+
   private _detailsCollapsed = false;
   private lastErrorTimer: any;
   private lastReparseErrorTimer: any;
@@ -202,6 +211,19 @@ export class AppComponent implements OnDestroy, OnInit {
     { label: 'JSON-Z for JSONP sample', command: (): void => this.sampleSelected(SampleOptions.JSONZ_JSONP) },
     { label: 'JSON-Z sample', command: (): void => this.sampleSelected(SampleOptions.JSONZ) }
   ];
+
+  replacerSampleOptions: MenuItem[] = [
+    { label: 'Strings to uppercase', command: (): void => this.sampleSelected(SampleOptions.UPPERCASE) },
+    { label: 'Rounding numbers', command: (): void => this.sampleSelected(SampleOptions.ROUNDING) },
+    { label: 'Deleting values', command: (): void => this.sampleSelected(SampleOptions.DELETING) },
+    { label: 'Integers as hexadecimal', command: (): void => this.sampleSelected(SampleOptions.HEXADECIMAL) }
+  ];
+
+  reviverSampleOptions: MenuItem[] = [
+    { label: 'Strings to uppercase', command: (): void => this.sampleSelected(SampleOptions.UPPERCASE, true) },
+    { label: 'Disable implied octal', command: (): void => this.sampleSelected(SampleOptions.NO_OCTAL, true) },
+    { label: 'Deleting values', command: (): void => this.sampleSelected(SampleOptions.DELETING, true) }
+];
 
   banner: SafeHtml;
   currentOptions: JsonZOptions = Object.assign({}, theWorks);
@@ -327,7 +349,7 @@ export class AppComponent implements OnDestroy, OnInit {
     document.removeEventListener('click', this.clickListener);
   }
 
-  sampleSelected(sampleOption: SampleOptions): void {
+  sampleSelected(sampleOption: SampleOptions, forReviver = false): void {
     switch (sampleOption) {
       case SampleOptions.JAVASCRIPT:
         this.inputOption = InputOptions.AS_JAVASCRIPT;
@@ -359,6 +381,39 @@ export class AppComponent implements OnDestroy, OnInit {
         this.onInputOptionChange(sample3);
         this.onParsingChange(false);
         this.setTheWorks();
+        break;
+
+      case SampleOptions.UPPERCASE:
+        if (forReviver)
+          this.reviver = sharedSample1;
+        else
+          this.replacer = sharedSample1;
+
+        this.onChange(false);
+        break;
+
+      case SampleOptions.ROUNDING:
+        this.replacer = replacerSample2;
+        this.onChange(false);
+        break;
+
+      case SampleOptions.NO_OCTAL:
+        this.reviver = reviverSample2;
+        this.onChange(false);
+        break;
+
+      case SampleOptions.DELETING:
+        if (forReviver)
+          this.reviver = sharedSample3;
+        else
+          this.replacer = sharedSample3;
+
+        this.onChange(false);
+        break;
+
+      case SampleOptions.HEXADECIMAL:
+        this.replacer = replacerSample4;
+        this.onChange(false);
         break;
     }
   }
@@ -420,7 +475,7 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   clearReviver(): void {
-    this.replacer = allPurposeCallback;
+    this.reviver = allPurposeCallback;
     this.onChange();
   }
 

@@ -118,10 +118,11 @@
           [showHeader]="true" [modal]="true" [dismissableMask]="true">
         <div [innerHTML]="replacerInfo"></div>
       </p-dialog>
-      <p-menu #samples [popup]="true" [model]="[]" appendTo="body"
+      <p-menu #replacerSamples [popup]="true" [model]="replacerSampleOptions" appendTo="body"
           (onHide)="sampleSelected($event)"></p-menu>
-      <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
-      <i class="fas fa-trash" [class.faded]="!source" (click)="clearReplacer()"></i>
+      <i class="fas fa-caret-down sample-menu" [class.faded]="!useReplacer"
+          (click)="useReplacer && replacerSamples.toggle($event)"></i>
+      <i class="fas fa-trash" [class.faded]="replacer === allPurposeCallback" (click)="clearReplacer()"></i>
     </div></div>
     <textarea pTextarea
         title="Replacer"
@@ -178,10 +179,11 @@
           [showHeader]="true" [modal]="true" [dismissableMask]="true">
         <div [innerHTML]="reviverInfo"></div>
       </p-dialog>
-      <p-menu #samples [popup]="true" [model]="[]" appendTo="body"
+      <p-menu #reviverSamples [popup]="true" [model]="reviverSampleOptions" appendTo="body"
           (onHide)="sampleSelected($event)"></p-menu>
-      <i class="fas fa-caret-down sample-menu" (click)="samples.toggle($event)"></i>
-      <i class="fas fa-trash" [class.faded]="!source" (click)="clearReviver()"></i>
+      <i class="fas fa-caret-down sample-menu" [class.faded]="!useReviver"
+          (click)="useReviver && reviverSamples.toggle($event)"></i>
+      <i class="fas fa-trash" [class.faded]="reviver === allPurposeCallback" (click)="clearReviver()"></i>
     </div></div>
     <textarea pTextarea
         title="Replacer"

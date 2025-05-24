@@ -50,6 +50,7 @@ No \\\\n's!",
   date2: {"_$_": "Date", "_$_value": "2020-07-25T15:44:05.014Z"},
   // A relatively compact way to send and receive binary data
   buffer: _Uint8Array('T25lLiBUd28uIEZpdmUuLi4gSSBtZWFuIHRocmVlIQ=='),
+  \`secret\`: 'Sssshhhh!',
   "backwardsCompatible": "with JSON",
 }`;
 
@@ -73,3 +74,33 @@ No \\\\n's!",
   'key': "doesn't have to be unquoted",
   "backwardsCompatible": "with JSON",
 }`;
+
+export const sharedSample1 =
+  `// Convert all strings to uppercase
+(key, value) => typeof value === 'string' ? value.toUpperCase() : value`;
+
+export const replacerSample2 =
+  `// Round all numbers to two decimal places
+(key, value) => typeof value === 'number' ? Math.round(value * 100) / 100 : value`;
+
+export const reviverSample2 =
+  `// Disable implied octal interpretation of leading zeroes
+(key, value, content) => typeof value === 'number' && /^[-+]?0/.test(content?.source) ?
+  Number(content.source.replace('+', '')) : value`;
+
+export const sharedSample3 =
+  `// Delete any object member named "secret"
+(key, value) => key === 'secret' ? JSONZ.DELETE : value`;
+
+export const replacerSample4 =
+  `// Display all integer values as hexadecimal
+function hex(key, value) {
+  if (typeof value === 'number' && !isNaN(value) && isFinite(value) && Math.floor(value) === value)
+    return JSONZ.LITERALLY_AS((value < 0 ? '-' : '') + '0x' + Math.abs(value).toString(16).toUpperCase());
+  else if (typeof value === 'bigint') {
+    const sign = value < 0 ? (value = -value) && '-' : '';
+    return JSONZ.LITERALLY_AS(sign + '0x' + value.toString(16).toUpperCase() + 'n');
+  }
+  
+  return value;
+}`
