@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as JSONZ from 'json-z';
+import JSONZ from 'json-z';
 import { JsonZOptions } from 'json-z';
 import { clone } from '@tubular/util';
 

@@ -1,6 +1,6 @@
 import { Decimal as BigDecimal } from 'decimal.js';
 import { Decimal } from 'proposal-decimal';
-import * as JSONZ from 'json-z';
+import JSONZ from 'json-z';
 import * as babel from '@babel/standalone';
 
 export const NO_RESULT = Symbol('NO_RESULT');
