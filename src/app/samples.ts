@@ -101,6 +101,6 @@ function hex(key, value) {
     const sign = value < 0 ? (value = -value) && '-' : '';
     return JSONZ.LITERALLY_AS(sign + '0x' + value.toString(16).toUpperCase() + 'n');
   }
-  
+
   return value;
-}`
+}`;
