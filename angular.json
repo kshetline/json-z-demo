@@ -36,17 +36,18 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
+              "@babel/standalone",
               "json5",
               "json-z"
-            ],
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "5mb",
+                  "maximumError": "8mb"
                 },
                 {
                   "type": "anyComponentStyle",
