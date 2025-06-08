@@ -31,15 +31,59 @@
       </div>
 
       <div class="other-options">
-        <span class="labeled-select">
-          <label [class.as-disabled]="isJson5()">extendedTypes:</label>
-          <p-select class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes" [disabled]="isJson5()"
-              [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-select>
+        <span class="labeled-input-pair">
+          <label for="space">space:</label>
+          <input id="space"
+                 pInputText
+                 [class.error]="spaceError"
+                 autocapitalize="off"
+                 autocomplete="off"
+                 autocorrect="off"
+                 spellcheck="false"
+                 [(ngModel)]="space"
+                 (input)="onChange()">
+          <label for="maxIndent" [class.as-disabled]="isJson5()">maxIndent:</label>
+          <input id="maxIndent" [disabled]="isJson5()"
+                 pInputText
+                 [class.error]="maxIndentError"
+                 autocapitalize="off"
+                 autocomplete="off"
+                 autocorrect="off"
+                 spellcheck="false"
+                 [(ngModel)]="maxIndent"
+                 (input)="onChange()">
         </span>
         <span class="labeled-select">
           <label>quote:</label>
           <p-select class="wider" [options]="quoteOptions" placeholder="quote"
               [(ngModel)]="currentOptions.quote" (onChange)="onChange()"></p-select>
+        </span>
+        <span class="labeled-input">
+          <label for="propertyFilter" [class.as-disabled]="isJson5() && useReplacer">propertyFilter:</label>
+          <input id="oneLiners" [disabled]="isJson5() && useReplacer"
+                 pInputText
+                 autocapitalize="off"
+                 autocomplete="off"
+                 autocorrect="off"
+                 spellcheck="false"
+                 [(ngModel)]="propertyFilter"
+                 (input)="onParsingChange()">
+        </span>
+        <span class="labeled-input">
+          <label for="oneLiners" [class.as-disabled]="isJson5()">oneLiners:</label>
+          <input id="oneLiners" [disabled]="isJson5()"
+                 pInputText
+                 autocapitalize="off"
+                 autocomplete="off"
+                 autocorrect="off"
+                 spellcheck="false"
+                 [(ngModel)]="oneLiners"
+                 (input)="onParsingChange()">
+        </span>
+        <span class="labeled-select">
+          <label [class.as-disabled]="isJson5()">extendedTypes:</label>
+          <p-select class="wider" [options]="extendedTypesOptions" placeholder="extendedTypes" [disabled]="isJson5()"
+                    [(ngModel)]="currentOptions.extendedTypes" (onChange)="onChange()"></p-select>
         </span>
         <span class="labeled-input">
           <label for="typePrefix" [class.as-disabled]="isJson5()">typePrefix:</label>
@@ -52,18 +96,6 @@
               spellcheck="false"
               [(ngModel)]="typePrefix"
               (input)="onParsingChange()">
-        </span>
-        <span class="labeled-input">
-          <label for="space">space:</label>
-          <input id="space"
-              pInputText
-              [class.error]="spaceError"
-              autocapitalize="off"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="false"
-              [(ngModel)]="space"
-              (input)="onChange()">
         </span>
       </div>
     </p-fieldset>

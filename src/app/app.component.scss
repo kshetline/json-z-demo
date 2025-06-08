@@ -141,6 +141,24 @@ h3 {
   }
 }
 
+.labeled-input-pair {
+  align-items: baseline;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+  white-space: nowrap;
+
+  label {
+    display: inline-block;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  input {
+    width: 80px;
+  }
+}
+
 .other-options {
   display: flex;
   flex-flow: row wrap;

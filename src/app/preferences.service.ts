@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import JSONZ from 'json-z';
-import { JsonZOptions } from 'json-z';
+import JSONZ, { JsonZOptions } from 'json-z';
 import { clone } from '@tubular/util';
 
 export enum InputOptions {
@@ -20,7 +19,10 @@ export enum ReparseOptions {
 export interface Preferences {
   detailsCollapsed?: boolean;
   inputOption?: InputOptions;
+  maxIndent?: string | number;
+  oneLiners?: string;
   options?: JsonZOptions;
+  propertyFilter?: string[];
   replacer?: string;
   replacerOn?: boolean;
   reparseOption?: ReparseOptions;

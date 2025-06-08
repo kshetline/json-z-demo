@@ -12,7 +12,7 @@ import {
   replacerSample2, replacerSample4, reviverSample2, sample1, sample2, sample3, sample4,
   sharedSample1, sharedSample3
 } from './samples';
-import { isEqual, isString } from '@tubular/util';
+import { isEqual, isString, toInt } from '@tubular/util';
 import { ShrinkWrapComponent } from './widgets/shrink-wrap/shrink-wrap.component';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -35,9 +35,12 @@ const ERROR_DELAY = 2000;
 const compatibleOptions: JsonZOptions = {
   extendedPrimitives: false,
   extendedTypes: ExtendedTypeMode.OFF,
+  maxIndent: '',
+  oneLiners: '',
   primitiveBigDecimal: false,
   primitiveBigInt: false,
   primitiveDecimal: false,
+  propertyFilter: [],
   quote: Quote.DOUBLE,
   quoteAllKeys: true,
   revealHiddenArrayProperties: false,
@@ -50,9 +53,12 @@ const compatibleOptions: JsonZOptions = {
 const relaxedOptions: JsonZOptions = {
   extendedPrimitives: true,
   extendedTypes: ExtendedTypeMode.OFF,
+  maxIndent: '',
+  oneLiners: '',
   primitiveBigDecimal: false,
   primitiveBigInt: true,
   primitiveDecimal: false,
+  propertyFilter: [],
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
@@ -65,9 +71,12 @@ const relaxedOptions: JsonZOptions = {
 const theWorks: JsonZOptions = {
   extendedPrimitives: true,
   extendedTypes: ExtendedTypeMode.AS_FUNCTIONS,
+  maxIndent: '',
+  oneLiners: 'stuff',
   primitiveBigDecimal: true,
   primitiveBigInt: true,
   primitiveDecimal: true,
+  propertyFilter: [],
   quote: Quote.PREFER_SINGLE,
   quoteAllKeys: false,
   revealHiddenArrayProperties: false,
@@ -158,6 +167,9 @@ export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
   private lastErrorTimer: any;
   private lastReparseErrorTimer: any;
+  private _maxIndent: string | number = '';
+  private _oneLiners = '';
+  private _propertyFilter = '';
   private newErrorTime = 0;
   private newReparseErrorTime = 0;
   private pendingOutput: string;
@@ -230,6 +242,7 @@ export class AppComponent implements OnDestroy, OnInit {
   reviveTypedContainers = true;
   inputInfo = inputInfoJavaScript;
   inputOption = InputOptions.AS_JAVASCRIPT;
+  maxIndentError = false;
   output = '';
   outputError = false;
   replacer = allPurposeCallback;
@@ -264,7 +277,7 @@ export class AppComponent implements OnDestroy, OnInit {
 
     if (this._space !== newValue) {
       if (/^\s*\d\d?\s*/.test(newValue)) {
-        const space = parseInt(newValue, 10);
+        const space = toInt(newValue);
 
         if (space > 10)
           this.spaceError = true;
@@ -283,6 +296,46 @@ export class AppComponent implements OnDestroy, OnInit {
     }
     else if (this._space === newValue)
       this.spaceError = false;
+  }
+
+  get maxIndent(): string | number { return this._maxIndent; }
+  set maxIndent(newValue: string | number) {
+    newValue = String(newValue);
+
+    if (this._maxIndent !== newValue) {
+      if (newValue?.trim() === '' || /^\s*\d\d?\s*/.test(newValue)) {
+        const maxIndent = toInt(newValue) || '';
+
+        if (maxIndent && maxIndent < 0)
+          this.maxIndentError = true;
+        else {
+          this._maxIndent = maxIndent;
+          this.maxIndentError = false;
+          this.currentOptions.maxIndent = maxIndent;
+        }
+      }
+      else {
+        this.maxIndentError = true;
+      }
+    }
+    else if (this._maxIndent === newValue)
+      this.maxIndentError = false;
+  }
+
+  get oneLiners(): string { return this._oneLiners; }
+  set oneLiners(newValue: string) {
+    if (this._oneLiners !== newValue) {
+      this._oneLiners = newValue;
+      this.currentOptions.oneLiners = newValue;
+    }
+  }
+
+  get propertyFilter(): string { return this._propertyFilter; }
+  set propertyFilter(newValue: string) {
+    if (this._propertyFilter !== newValue) {
+      this._propertyFilter = newValue;
+      this.currentOptions.propertyFilter = (newValue || '').split(',').map(s => s.trim()).filter(s => !!s);
+    }
   }
 
   get typePrefix(): string { return this._typePrefix; }
@@ -325,8 +378,12 @@ export class AppComponent implements OnDestroy, OnInit {
       this.reviveTypedContainers = prefs.reviveTypedContainers ?? this.reviveTypedContainers;
       this.source = prefs.source || '';
       this.space = prefs.space || 0;
+      this.maxIndent = this.currentOptions.maxIndent;
+      this.oneLiners = (this.currentOptions.oneLiners || '') as string;
+      this.propertyFilter = (this.currentOptions.propertyFilter || []).join(', ');
       this.typePrefix = this.currentOptions.typePrefix;
-      // Get back the default if the prefs value turned out to be invalid
+      // Get back the defaults if the prefs values turned out to be invalid
+      this.currentOptions.maxIndent = this.maxIndent as (number | '');
       this.currentOptions.typePrefix = this.typePrefix;
 
       this.showJsonZOutput = this.inputOption === InputOptions.AS_JAVASCRIPT;
@@ -643,11 +700,16 @@ export class AppComponent implements OnDestroy, OnInit {
         const quote = isString(q) ? q.toString() :
           (q === Quote.DOUBLE || q === Quote.PREFER_DOUBLE) ? '"' : "'";
 
-        this.reparsed = JSON5.stringify(this.reparsedValue, {
-          space: this.space,
-          quote,
-          replacer: this.replacerFn
-        });
+        if (!this.useReplacer && this.currentOptions.propertyFilter?.length > 0)
+          this.reparsed = JSON5.stringify(this.reparsedValue, this.currentOptions.propertyFilter as any, this.space);
+        else {
+          this.reparsed = JSON5.stringify(this.reparsedValue, {
+            space: this.space,
+            quote,
+            replacer: this.replacerFn
+          });
+        }
+
         this.displayedFormat = 'JSON5';
       }
       else {
@@ -682,21 +744,25 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   isCompatible(): boolean {
-    return isEqual(this.currentOptions, compatibleOptions) && !this.reviveTypedContainers;
+    return isEqual(this.currentOptions, compatibleOptions, { keysToIgnore: ['replacer'] }) &&
+           !this.reviveTypedContainers;
   }
 
   isRelaxed(): boolean {
-    return isEqual(this.currentOptions, relaxedOptions) && this.reviveTypedContainers;
+    return isEqual(this.currentOptions, relaxedOptions, { keysToIgnore: ['replacer'] }) &&
+           this.reviveTypedContainers;
   }
 
   isTheWorks(): boolean {
-    return isEqual(this.currentOptions, theWorks) && this.reviveTypedContainers;
+    return isEqual(this.currentOptions, theWorks, { keysToIgnore: ['replacer'] }) &&
+           this.reviveTypedContainers;
   }
 
   setCompatible(): void {
     this.currentOptions = {};
     Object.assign(this.currentOptions, compatibleOptions);
     this.reviveTypedContainers = false;
+    this.oneLiners = '';
     this.typePrefix = '_';
     this.onChange();
   }
@@ -705,6 +771,7 @@ export class AppComponent implements OnDestroy, OnInit {
     this.currentOptions = {};
     Object.assign(this.currentOptions, relaxedOptions);
     this.reviveTypedContainers = true;
+    this.oneLiners = '';
     this.typePrefix = '_';
     this.onChange();
   }
@@ -713,6 +780,7 @@ export class AppComponent implements OnDestroy, OnInit {
     this.currentOptions = {};
     Object.assign(this.currentOptions, theWorks);
     this.reviveTypedContainers = true;
+    this.oneLiners = this.currentOptions.oneLiners as string;
     this.typePrefix = '_';
     this.onChange();
   }
@@ -751,7 +819,10 @@ export class AppComponent implements OnDestroy, OnInit {
     const prefs = {
       detailsCollapsed: this.detailsCollapsed,
       inputOption: this.inputOption,
+      maxIndent: this.maxIndent,
+      oneLiners: this.oneLiners.trim(),
       options: this.currentOptions,
+      propertyFilter: (this.propertyFilter || '').split(',').map(s => s.trim()).filter(s => !!s),
       replacer: this.replacer,
       replacerOn: this.useReplacer,
       reviver: this.reviver,
