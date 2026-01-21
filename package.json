@@ -38,7 +38,7 @@
     "@angular-eslint/eslint-plugin": "^15.2.0",
     "@angular-eslint/eslint-plugin-template": "^15.2.0",
     "@angular-eslint/template-parser": "^15.2.0",
-    "@angular/cli": "^19.2.12",
+    "@angular/cli": "^21.1.0",
     "@angular/compiler-cli": "^19.2.11",
     "@angular/language-service": "^19.2.1",
     "@types/babel__standalone": "^7.1.9",
